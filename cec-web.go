@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
-	"github.com/chbmuc/cec"
+	"github.com/robbiet480/cec"
 	"strings"
 	"log"
 	"os"
@@ -14,6 +14,7 @@ type Options struct {
 	Port string `short:"p" long:"port" description:"tcp port to listen on" default:"8080"`
 	Adapter string `short:"a" long:"adapter" description:"cec adapter to connect to [RPI, usb, ...]"`
 	Name string `short:"n" long:"name" description:"OSD name to announce on the cec bus" default:"REST Gateway"`
+	Type string `short:"t" long:"type" description:"The device type to register as" default:"tuner"`
 }
 
 var options Options 
@@ -24,7 +25,7 @@ func main() {
 		os.Exit(1) 
 	} 
 
-	cec.Open(options.Adapter, options.Name)
+	cec.Open(options.Adapter, options.Name, options.Type)
 	
 	r := gin.Default()
 	r.GET("/info", info)
