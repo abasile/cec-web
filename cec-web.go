@@ -5,7 +5,6 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/robbiet480/cec"
 	"strings"
-	"log"
 	"os"
 )
 
