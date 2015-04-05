@@ -5,6 +5,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/chbmuc/cec"
 	"strings"
+	"log"
 	"os"
 )
 
@@ -36,6 +37,7 @@ func main() {
 	r.PUT("/volume/mute", vol_mute)
 	//r.POST("/key/:device", key_post)
 	r.PUT("/key/:device/:key", key)
+	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
 
 	r.Run(options.Host + ":" + options.Port)
@@ -80,6 +82,17 @@ func source_status(c *gin.Context) {
 			c.String(200, "INPUT HDMI "+strings.Split(cec.GetDevicePhysicalAddress(address), ".")[0]);
 		}
 	}
+}
+
+func change_channel(c *gin.Context) {
+	addr := cec.GetLogicalAddressByName(c.Params.ByName("device"))
+	channel := c.Params.ByName("channel")
+
+	for _, number := range channel {
+		cec.Key(addr, "0x2"+string(number))
+	}
+
+	c.String(200, channel)
 }
 
 func transmit(c *gin.Context) {

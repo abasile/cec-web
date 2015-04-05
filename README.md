@@ -88,6 +88,13 @@ is in standy/no power (GET)
 > ``:device`` is the name of the device on the CEC bus (see ``GET /info``)
 > ``:key`` is the name (e.g. ``down``) or the keycode in hex (e.g. ``0x00``) of a remote key
 
+## Change the channel
+
+* ``PUT /key/:device/:channel`` - Change the channel. Just a conveinence function instead of pressing individual buttons
+
+> ``:device`` is the name of the device on the CEC bus (see ``GET /info``)
+> ``:channel`` is the channel number (e.g. ``123``)
+
 #### Response
 
     HTTP/1.1 204 No Content
