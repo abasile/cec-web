@@ -35,7 +35,6 @@ func main() {
 	r.PUT("/volume/up", vol_up)
 	r.PUT("/volume/down", vol_down)
 	r.PUT("/volume/mute", vol_mute)
-	//r.POST("/key/:device", key_post)
 	r.PUT("/key/:device/:key", key)
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
@@ -51,14 +50,14 @@ func power_on(c *gin.Context) {
 	addr := cec.GetLogicalAddressByName(c.Params.ByName("device"))
 
 	cec.PowerOn(addr)
-	c.String(204, "")
+	c.String(200, "on")
 }
 
 func power_off(c *gin.Context) {
 	addr := cec.GetLogicalAddressByName(c.Params.ByName("device"))
 
 	cec.Standby(addr)
-	c.String(204, "")
+	c.String(200, "off")
 }
 
 func power_status(c *gin.Context) {
@@ -66,9 +65,9 @@ func power_status(c *gin.Context) {
 
 	status := cec.GetDevicePowerStatus(addr)
 	if status == "on" {
-		c.String(204, "")
+		c.String(200, "on")
 	} else if status == "standby" {
-		c.String(404, "")
+		c.String(200, "off")
 	} else {
 		c.String(500, "invalid power state")
 	}

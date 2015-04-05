@@ -62,14 +62,15 @@ The app provides the following JSON based RESTful API:
 
 #### Responses
 
-success (PUT/DELETE); is powered on (GET)
+is powered on (PUT/GET)
 
-    HTTP/1.1 204 No Content
+    HTTP/1.1 200
+`on`
 
-is in standy/no power (GET)
+is in standby/no power (GET/DELETE);
 
-    HTTP/1.1 404 Not Found
-
+    HTTP/1.1 200
+`off`
 
 ## Volume (not supported by all devices)
 
@@ -98,7 +99,7 @@ is in standy/no power (GET)
 #### Response
 
     HTTP/1.1 200 OK
-``123``
+`123`
 
 ## Raw CEC commands
 
