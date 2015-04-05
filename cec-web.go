@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
 	"github.com/chbmuc/cec"
+	"strings"
 	"os"
 )
 
@@ -26,6 +27,7 @@ func main() {
 	
 	r := gin.Default()
 	r.GET("/info", info)
+	r.GET("/sourcestatus", source_status)
 	r.GET("/power/:device", power_status)
 	r.PUT("/power/:device", power_on)
 	r.DELETE("/power/:device", power_off)
@@ -67,6 +69,16 @@ func power_status(c *gin.Context) {
 		c.String(404, "")
 	} else {
 		c.String(500, "invalid power state")
+	}
+}
+
+func source_status(c *gin.Context) {
+	active_devices := cec.GetActiveDevices()
+
+	for address, active := range active_devices {
+		if (active) && (cec.IsActiveSource(address)) {
+			c.String(200, "INPUT HDMI "+strings.Split(cec.GetDevicePhysicalAddress(address), ".")[0]);
+		}
 	}
 }
 
