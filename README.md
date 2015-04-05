@@ -97,7 +97,8 @@ is in standy/no power (GET)
 
 #### Response
 
-    HTTP/1.1 204 No Content
+    HTTP/1.1 200 OK
+``123``
 
 ## Raw CEC commands
 
