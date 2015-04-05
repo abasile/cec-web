@@ -28,7 +28,7 @@ func main() {
 	
 	r := gin.Default()
 	r.GET("/info", info)
-	r.GET("/sourcestatus", source_status)
+	r.GET("/source", source_status)
 	r.GET("/power/:device", power_status)
 	r.PUT("/power/:device", power_on)
 	r.DELETE("/power/:device", power_off)

@@ -1,9 +1,11 @@
 cec-web
 =======
 
-A REST micro webservice to control devices via the CEC bus in HDMI.
+A REST micro webservice to control devices via the CEC bus in HDMI. Specifically written for use with Roomie Remote via [CEC-Roomie](http://github.com/robbiet480/CEC-Roomie)
 
-Written in Go with some help from [Gin](http://gin-gonic.github.io/gin/), [Go-Flags](https://github.com/jessevdk/go-flags) and [cec.go](https://github.com/chbmuc/cec).
+Written in Go with some help from [Gin](http://gin-gonic.github.io/gin/), [Go-Flags](https://github.com/jessevdk/go-flags) and [cec.go](https://github.com/robbiet480/cec).
+
+Based on [chbmuc's](http://github.com/chbmuc) [cec-web](https://github.com/chbmuc/cec-web) and [cec.go](https://github.com/chbmuc/cec)
 
 Usage
 =====
@@ -51,7 +53,16 @@ The app provides the following JSON based RESTful API:
   }
 }
 ```
-    
+
+## Get the current source label
+
+* ``GET /source`` - Get the current source label, formatted for Roomie. If none, will return nothing (with a 200 status)
+
+#### Response
+
+    HTTP/1.1 200 OK
+`INPUT HDMI 1`
+
 ## Power
 
 * ``GET /power/:device`` - Request device power status
