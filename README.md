@@ -18,6 +18,7 @@ Usage
       -p, --port=    tcp port to listen on (8080)
       -a, --adapter= cec adapter to connect to [RPI, usb, ...]
       -n, --name=    OSD name to announce on the cec bus (REST Gateway)
+      -t, --type=    The device type to announce [tv, recording, reserved, tuner, playback, audio] (tuner)
 
 
 JSON API
