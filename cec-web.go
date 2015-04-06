@@ -4,28 +4,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
 	"github.com/robbiet480/cec"
-	"strings"
 	"os"
+	"strings"
 )
 
 type Options struct {
-	Host string `short:"i" long:"ip" description:"ip to listen on" default:"127.0.0.1"`
-	Port string `short:"p" long:"port" description:"tcp port to listen on" default:"8080"`
+	Host    string `short:"i" long:"ip" description:"ip to listen on" default:"127.0.0.1"`
+	Port    string `short:"p" long:"port" description:"tcp port to listen on" default:"8080"`
 	Adapter string `short:"a" long:"adapter" description:"cec adapter to connect to [RPI, usb, ...]"`
-	Name string `short:"n" long:"name" description:"OSD name to announce on the cec bus" default:"REST Gateway"`
-	Type string `short:"t" long:"type" description:"The device type to register as" default:"tuner"`
+	Name    string `short:"n" long:"name" description:"OSD name to announce on the cec bus" default:"REST Gateway"`
+	Type    string `short:"t" long:"type" description:"The device type to register as" default:"tuner"`
 }
 
-var options Options 
-var parser = flags.NewParser(&options, flags.Default) 
+var options Options
+var parser = flags.NewParser(&options, flags.Default)
 
 func main() {
-	if _, err := parser.Parse(); err != nil { 
-		os.Exit(1) 
-	} 
+	if _, err := parser.Parse(); err != nil {
+		os.Exit(1)
+	}
 
 	cec.Open(options.Adapter, options.Name, options.Type)
-	
+
 	r := gin.Default()
 	r.GET("/info", info)
 	r.GET("/source", source_status)
@@ -78,7 +78,7 @@ func source_status(c *gin.Context) {
 
 	for address, active := range active_devices {
 		if (active) && (cec.IsActiveSource(address)) {
-			c.String(200, "INPUT HDMI "+strings.Split(cec.GetDevicePhysicalAddress(address), ".")[0]);
+			c.String(200, "INPUT HDMI "+strings.Split(cec.GetDevicePhysicalAddress(address), ".")[0])
 		}
 	}
 }
@@ -102,22 +102,22 @@ func transmit(c *gin.Context) {
 		cec.Transmit(val)
 	}
 	c.String(204, "")
-}	
+}
 
 func vol_up(c *gin.Context) {
 	cec.VolumeUp()
 	c.String(204, "")
-}	
+}
 
 func vol_down(c *gin.Context) {
 	cec.VolumeDown()
 	c.String(204, "")
-}	
+}
 
 func vol_mute(c *gin.Context) {
 	cec.Mute()
 	c.String(204, "")
-}	
+}
 
 func key(c *gin.Context) {
 	addr := cec.GetLogicalAddressByName(c.Params.ByName("device"))
