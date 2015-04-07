@@ -21,6 +21,7 @@ var options Options
 var parser = flags.NewParser(&options, flags.Default)
 
 var volume_level int
+var is_muted = false
 
 func main() {
 	if _, err := parser.Parse(); err != nil {
@@ -115,8 +116,10 @@ func vol_step(c *gin.Context) {
 	for i := 1; i < steps; i++ {
 		if direction == "up" {
 			cec.VolumeUp()
+			volume_level = volume_level + steps
 		} else if direction == "down" {
 			cec.VolumeDown()
+			volume_level = volume_level - steps
 		} else {
 			c.String(400, "Invalid direction. Valid directions are up or down.")
 		}
@@ -130,7 +133,9 @@ func vol_set(c *gin.Context) {
 	level_atoi, _ := strconv.Atoi(level_str)
 	wanted_level := int(level_atoi)
 
-	if wanted_level > volume_level { // Requested level is greater then current volume level
+	if wanted_level > 100 {
+		c.String(400, "The maximum volume level is 100")
+	} else if wanted_level > volume_level { // Requested level is greater then current volume level
 		var final_level = volume_level - wanted_level
 		for i := 1; i < final_level; i++ {
 			cec.VolumeUp()
@@ -142,11 +147,17 @@ func vol_set(c *gin.Context) {
 		}
 	}
 
+	volume_level = wanted_level
+
 	c.String(200, string(volume_level))
 }
 
 func vol_status(c *gin.Context) {
-	c.String(200, string(volume_level))
+	if is_muted == true {
+		c.String(200, "muted")
+	} else {
+		c.String(200, string(volume_level))
+	}
 }
 
 func transmit(c *gin.Context) {
@@ -160,17 +171,28 @@ func transmit(c *gin.Context) {
 }
 
 func vol_up(c *gin.Context) {
-	cec.VolumeUp()
-	c.String(204, "")
+	if volume_level == 100 {
+		c.String(400, "Volume already at maximum")
+	} else {
+		cec.VolumeUp()
+		volume_level = volume_level + 1
+		c.String(204, "")
+	}
 }
 
 func vol_down(c *gin.Context) {
-	cec.VolumeDown()
-	c.String(204, "")
+	if volume_level == 0 {
+		c.String(400, "Volume is already at minimum")
+	}	else {
+		cec.VolumeDown()
+		volume_level = volume_level - 1
+		c.String(204, "")
+	}
 }
 
 func vol_mute(c *gin.Context) {
 	cec.Mute()
+	is_muted = true
 	c.String(204, "")
 }
 
