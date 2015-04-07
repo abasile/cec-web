@@ -17,6 +17,7 @@ type Options struct {
 	Adapter string `short:"a" long:"adapter" description:"cec adapter to connect to [RPI, usb, ...]"`
 	Name    string `short:"n" long:"name" description:"OSD name to announce on the cec bus" default:"REST Gateway"`
 	Type    string `short:"t" long:"type" description:"The device type to register as" default:"tuner"`
+  AudioDevice string `short:"d" long:"audio-device" description:"The audio device to target [TV, Audio]" default:"TV"`
 }
 
 var options Options
@@ -56,7 +57,7 @@ func main() {
 	time.Sleep(5 * time.Second)
 	log.Println("Resetting volume to 0")
 	for i := 0; i < 100; i++ {
-		addr := cec.GetLogicalAddressByName("TV")
+		addr := cec.GetLogicalAddressByName(options.AudioDevice)
 		log.Println("Sending VolumeDown")
 		cec.Key(addr, "VolumeDown")
 	}
@@ -139,11 +140,11 @@ func vol_step(c *gin.Context) {
 
 	for i := 0; i < steps; i++ {
 		if direction == "up" {
-			addr := cec.GetLogicalAddressByName("TV")
+			addr := cec.GetLogicalAddressByName(options.AudioDevice)
 			cec.Key(addr, "VolumeUp")
 			volume_level = volume_level + steps
 		} else if direction == "down" {
-			addr := cec.GetLogicalAddressByName("TV")
+			addr := cec.GetLogicalAddressByName(options.AudioDevice)
 			cec.Key(addr, "VolumeDown")
 			volume_level = volume_level - steps
 		} else {
@@ -168,7 +169,7 @@ func vol_set(c *gin.Context) {
 		var final_level = wanted_level - volume_level
 		log.Println("Final_level is " + strconv.Itoa(final_level))
 		for i := 0; i < final_level; i++ {
-			addr := cec.GetLogicalAddressByName("TV")
+			addr := cec.GetLogicalAddressByName(options.AudioDevice)
 			cec.Key(addr, "VolumeUp")
 		}
 	} else if wanted_level < volume_level { // Requested level is less than current volume level
@@ -176,7 +177,7 @@ func vol_set(c *gin.Context) {
 		var final_level = volume_level - wanted_level
 		log.Println("Final_level is " + strconv.Itoa(final_level))
 		for i := 0; i < final_level; i++ {
-			addr := cec.GetLogicalAddressByName("TV")
+			addr := cec.GetLogicalAddressByName(options.AudioDevice)
 			cec.Key(addr, "VolumeDown")
 		}
 	}
@@ -198,7 +199,7 @@ func vol_up(c *gin.Context) {
 	if volume_level == 100 {
 		c.String(400, "Volume already at maximum")
 	} else {
-		addr := cec.GetLogicalAddressByName("TV")
+		addr := cec.GetLogicalAddressByName(options.AudioDevice)
 		cec.Key(addr, "VolumeUp")
 		volume_level = volume_level + 1
 		c.String(204, "")
@@ -209,7 +210,7 @@ func vol_down(c *gin.Context) {
 	if volume_level == 0 {
 		c.String(400, "Volume is already at minimum")
 	} else {
-		addr := cec.GetLogicalAddressByName("TV")
+		addr := cec.GetLogicalAddressByName(options.AudioDevice)
 		cec.Key(addr, "VolumeDown")
 		volume_level = volume_level - 1
 		c.String(204, "")
@@ -229,7 +230,7 @@ func vol_mute_status(c *gin.Context) {
 func vol_reset(c *gin.Context) {
 	for i := 0; i < 100; i++ {
 		log.Println("Sending VolumeDown")
-		addr := cec.GetLogicalAddressByName("TV")
+		addr := cec.GetLogicalAddressByName(options.AudioDevice)
 
 		cec.Key(addr, "VolumeDown")
 	}
