@@ -44,6 +44,7 @@ func main() {
 	r.PUT("/volume/up", vol_up)
 	r.PUT("/volume/down", vol_down)
 	r.PUT("/volume/mute", vol_mute)
+  r.GET("/volume/mute", vol_mute_status)
 	r.PUT("/volume/reset", vol_reset)
 	r.PUT("/volume/step/:direction/:steps", vol_step)
 	r.PUT("/volume/set/:level", vol_set)
@@ -219,6 +220,10 @@ func vol_mute(c *gin.Context) {
 	cec.Mute()
 	is_muted = true
 	c.String(204, "")
+}
+
+func vol_mute_status(c *gin.Context) {
+  c.String(200, strconv.FormatBool(is_muted))
 }
 
 func vol_reset(c *gin.Context) {

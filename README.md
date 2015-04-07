@@ -94,6 +94,7 @@ CAVEAT: The volume code assumes that there is _not_ a receiver in your environme
 * ``PUT /volume/set/:level`` - Set volume to X level
 * ``PUT /volume/down`` - Reduce volume
 * ``PUT /volume/mute`` - Mute/unmute audio
+* ``GET /volume/mute`` - Get the current mute status
 
 > ``:direction`` is the direction to step the volume. Valid options are `up` or `down`
 > ``:steps`` is number of steps to change the volume by
@@ -112,6 +113,10 @@ Volume status (GET)
 Set volume to specific level, step volume up/down (PUT)
     HTTP/1.1 200
 `10`
+
+Mute status (GET)
+    HTTP/1.1 200
+`true` or `false`
 
 ## Remote control
 
