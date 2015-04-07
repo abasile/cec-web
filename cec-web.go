@@ -53,12 +53,17 @@ func main() {
 
 	// Let's reset the volume level to 0
 	time.Sleep(5 * time.Second)
+	log.Println("Resetting volume to 0")
 	for i := 0; i < 100; i++ {
 		addr := cec.GetLogicalAddressByName("TV")
-		log.Println("Loop")
+		log.Println("Sending VolumeDown")
 		cec.Key(addr, "VolumeDown")
 	}
 	volume_level = 0
+
+	log.Println("Volume has been set to 0")
+
+	log.Println("Getting the current active input")
 
 	for address, active := range cec.GetActiveDevices() {
 		if (active) && (cec.IsActiveSource(address)) {
@@ -218,7 +223,7 @@ func vol_mute(c *gin.Context) {
 
 func vol_reset(c *gin.Context) {
 	for i := 0; i < 100; i++ {
-		log.Println("Loop")
+		log.Println("Sending VolumeDown")
 		addr := cec.GetLogicalAddressByName("TV")
 
 		cec.Key(addr, "VolumeDown")
