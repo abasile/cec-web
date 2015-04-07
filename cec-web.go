@@ -17,7 +17,7 @@ type Options struct {
 	Adapter     string `short:"a" long:"adapter" description:"cec adapter to connect to [RPI, usb, ...]"`
 	Name        string `short:"n" long:"name" description:"OSD name to announce on the cec bus" default:"REST Gateway"`
 	Type        string `short:"t" long:"type" description:"The device type to register as" default:"tuner"`
-	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to target [TV, Audio]" default:"TV"`
+	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to use for volume control and status [TV, Audio]" default:"TV"`
 }
 
 var options Options
