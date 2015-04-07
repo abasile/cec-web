@@ -61,6 +61,7 @@ func main() {
 	r.PUT("/volume/reset", vol_reset)
 	r.PUT("/volume/step/:direction/:steps", vol_step)
 	r.PUT("/volume/set/:level", vol_set)
+	r.PUT("/volume/force/:level", vol_force_set)
 	r.PUT("/key/:device/:key", key)
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
@@ -201,6 +202,13 @@ func vol_set(c *gin.Context) {
 	volume_level = wanted_level
 
 	c.String(200, strconv.Itoa(volume_level))
+}
+
+func vol_force_set(c *gin.Context) {
+	level_str := c.Params.ByName("level")
+	level_atoi, _ := strconv.Atoi(level_str)
+	volume_level = int(level_atoi)
+	c.String(204, "")
 }
 
 func vol_status(c *gin.Context) {
