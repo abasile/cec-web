@@ -5,6 +5,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/robbiet480/cec"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -35,6 +36,7 @@ func main() {
 	r.PUT("/volume/up", vol_up)
 	r.PUT("/volume/down", vol_down)
 	r.PUT("/volume/mute", vol_mute)
+	r.PUT("/volume/step/:direction/:steps", vol_step)
 	r.PUT("/key/:device/:key", key)
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
@@ -92,6 +94,25 @@ func change_channel(c *gin.Context) {
 	}
 
 	c.String(200, channel)
+}
+
+func vol_step(c *gin.Context) {
+	steps_str := c.Params.ByName("steps")
+	steps_atoi, _ := strconv.Atoi(steps_str)
+	steps := int(steps_atoi)
+	direction := c.Params.ByName("direction")
+
+	for i := 1; i < steps; i++ {
+		if direction == "up" {
+			cec.VolumeUp()
+		} else if direction == "down" {
+			cec.VolumeDown()
+		} else {
+			c.String(400, "Invalid direction. Valid directions are up or down.")
+		}
+	}
+
+	c.String(204, "")
 }
 
 func transmit(c *gin.Context) {
