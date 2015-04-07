@@ -12,19 +12,19 @@ import (
 )
 
 type HTTPOptions struct {
-	Host string `short:"i" long:"ip" description:"ip to listen on" default:"0.0.0.0"`
-	Port string `short:"p" long:"port" description:"tcp port to listen on" default:"8080"`
+	Host string `short:"i" long:"ip" description:"IP address to listen on" default:"0.0.0.0"`
+	Port string `short:"p" long:"port" description:"TCP port to listen on" default:"8080"`
 }
 
 type CECOptions struct {
-	Adapter string `short:"a" long:"adapter" description:"cec adapter to connect to" default:"RPI"`
+	Adapter string `short:"a" long:"adapter" description:"CEC adapter to connect to" default:"RPI"`
 	Name    string `short:"n" long:"name" description:"OSD name to announce on the CEC bus" default:"cec-web"`
 	Type    string `short:"t" long:"type" description:"The device type to announce as" default:"tv" default:"recording" default:"reserved" default:"playback" default:"audio" default:"tuner"`
 }
 
 type AudioOptions struct {
 	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to use for volume control and status" default:"Audio" default:"TV"`
-	ResetVolume bool   `long:"reset-volume" description:"Whether to reset the volume to 0" default:"true"`
+	ResetVolume bool   `long:"reset-volume" description:"Whether to reset the volume to 0 at startup" default:"true"`
 }
 
 type Options struct {
@@ -65,14 +65,18 @@ func main() {
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
 
-	// Let's reset the volume level to 0
-	time.Sleep(5 * time.Second)
-	log.Println("Resetting volume to 0")
-	for i := 0; i < 100; i++ {
-		addr := cec.GetLogicalAddressByName(options.Audio.AudioDevice)
-		log.Println("Sending VolumeDown")
-		cec.Key(addr, "VolumeDown")
+	if options.Audio.ResetVolume {
+		// Let's reset the volume level to 0
+		log.Println("Resetting volume to 0")
+		for i := 0; i < 100; i++ {
+			addr := cec.GetLogicalAddressByName(options.Audio.AudioDevice)
+			log.Println("Sending VolumeDown")
+			cec.Key(addr, "VolumeDown")
+		}
+	} else {
+		log.Println("Not resetting volume to 0, assuming it is already at 0")
 	}
+
 	volume_level = 0
 
 	log.Println("Volume has been set to 0")
