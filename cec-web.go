@@ -142,11 +142,11 @@ func vol_set(c *gin.Context) {
 		}
 	}
 
-	c.String(200, volume_level)
+	c.String(200, string(volume_level))
 }
 
 func vol_status(c *gin.Context) {
-	c.String(200, vol_status)
+	c.String(200, string(volume_level))
 }
 
 func transmit(c *gin.Context) {

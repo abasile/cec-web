@@ -86,13 +86,30 @@ is in standby/no power (GET/DELETE);
 
 ## Volume (not supported by all devices)
 
+* ``GET /volume`` - Get the current volume
 * ``PUT /volume/up`` - Increase volume
+* ``PUT /volume/step/:direction/:steps`` - Move volume in direction by X steps
+* ``PUT /volume/set/:level`` - Set volume to X level
 * ``PUT /volume/down`` - Reduce volume
 * ``PUT /volume/mute`` - Mute/unmute audio
 
-#### Response
+> ``:direction`` is the direction to step the volume. Valid options are `up` or `down`
+> ``:steps`` is number of steps to change the volume by
+> ``:level`` is exact volume level to set
+
+#### Responses
+
+Volume up, Volume down, Volume mute (PUT)
 
     HTTP/1.1 204 No Content
+
+Volume status (GET)
+    HTTP/1.1 200
+`10`
+
+Set volume to specific level, step volume up/down (PUT)
+    HTTP/1.1 200
+`10`
 
 ## Remote control
 
