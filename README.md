@@ -55,9 +55,9 @@ The app provides the following JSON based RESTful API:
 }
 ```
 
-## Get the current source label
+## Get the current input
 
-* ``GET /source`` - Get the current source label, formatted for Roomie. If none, will return nothing (with a 200 status)
+* ``GET /input`` - Get the current input label, formatted for Roomie. If none, will return nothing (with a 200 status)
 
 #### Response
 
