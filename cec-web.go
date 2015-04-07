@@ -20,6 +20,8 @@ type Options struct {
 var options Options
 var parser = flags.NewParser(&options, flags.Default)
 
+var volume_level int
+
 func main() {
 	if _, err := parser.Parse(); err != nil {
 		os.Exit(1)
@@ -27,16 +29,24 @@ func main() {
 
 	cec.Open(options.Adapter, options.Name, options.Type)
 
+	// Let's reset the volume level to 0
+	for i := 0; i < 100; i++ {
+		cec.VolumeDown()
+	}
+	volume_level = 0
+
 	r := gin.Default()
 	r.GET("/info", info)
 	r.GET("/source", source_status)
 	r.GET("/power/:device", power_status)
 	r.PUT("/power/:device", power_on)
 	r.DELETE("/power/:device", power_off)
+	r.GET("/volume", vol_status)
 	r.PUT("/volume/up", vol_up)
 	r.PUT("/volume/down", vol_down)
 	r.PUT("/volume/mute", vol_mute)
 	r.PUT("/volume/step/:direction/:steps", vol_step)
+	r.PUT("/volume/set/:level", vol_set)
 	r.PUT("/key/:device/:key", key)
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
@@ -113,6 +123,30 @@ func vol_step(c *gin.Context) {
 	}
 
 	c.String(204, "")
+}
+
+func vol_set(c *gin.Context) {
+	level_str := c.Params.ByName("level")
+	level_atoi, _ := strconv.Atoi(level_str)
+	wanted_level := int(level_atoi)
+
+	if wanted_level > volume_level { // Requested level is greater then current volume level
+		var final_level = volume_level - wanted_level
+		for i := 1; i < final_level; i++ {
+			cec.VolumeUp()
+		}
+	} else if wanted_level < volume_level { // Requested level is less than current volume level
+		var final_level = volume_level - wanted_level
+		for i := 1; i < final_level; i++ {
+			cec.VolumeDown()
+		}
+	}
+
+	c.String(200, volume_level)
+}
+
+func vol_status(c *gin.Context) {
+	c.String(200, vol_status)
 }
 
 func transmit(c *gin.Context) {
