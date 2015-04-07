@@ -12,12 +12,12 @@ import (
 )
 
 type Options struct {
-	Host    string `short:"i" long:"ip" description:"ip to listen on" default:"127.0.0.1"`
-	Port    string `short:"p" long:"port" description:"tcp port to listen on" default:"8080"`
-	Adapter string `short:"a" long:"adapter" description:"cec adapter to connect to [RPI, usb, ...]"`
-	Name    string `short:"n" long:"name" description:"OSD name to announce on the cec bus" default:"REST Gateway"`
-	Type    string `short:"t" long:"type" description:"The device type to register as" default:"tuner"`
-  AudioDevice string `short:"d" long:"audio-device" description:"The audio device to target [TV, Audio]" default:"TV"`
+	Host        string `short:"i" long:"ip" description:"ip to listen on" default:"127.0.0.1"`
+	Port        string `short:"p" long:"port" description:"tcp port to listen on" default:"8080"`
+	Adapter     string `short:"a" long:"adapter" description:"cec adapter to connect to [RPI, usb, ...]"`
+	Name        string `short:"n" long:"name" description:"OSD name to announce on the cec bus" default:"REST Gateway"`
+	Type        string `short:"t" long:"type" description:"The device type to register as" default:"tuner"`
+	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to target [TV, Audio]" default:"TV"`
 }
 
 var options Options
@@ -45,7 +45,7 @@ func main() {
 	r.PUT("/volume/up", vol_up)
 	r.PUT("/volume/down", vol_down)
 	r.PUT("/volume/mute", vol_mute)
-  r.GET("/volume/mute", vol_mute_status)
+	r.GET("/volume/mute", vol_mute_status)
 	r.PUT("/volume/reset", vol_reset)
 	r.PUT("/volume/step/:direction/:steps", vol_step)
 	r.PUT("/volume/set/:level", vol_set)
@@ -224,7 +224,7 @@ func vol_mute(c *gin.Context) {
 }
 
 func vol_mute_status(c *gin.Context) {
-  c.String(200, strconv.FormatBool(is_muted))
+	c.String(200, strconv.FormatBool(is_muted))
 }
 
 func vol_reset(c *gin.Context) {
