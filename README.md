@@ -86,6 +86,8 @@ is in standby/no power (GET/DELETE);
 
 ## Volume (not supported by all devices)
 
+CAVEAT: The volume code assumes that there is _not_ a receiver in your environment, so it does it's own volume tracking as there is no way in CEC to do volume tracking for devices other than a receiver. It's hacky, but it works well for me so far. When you start up cec-web and before it starts accepting requests, it will send 100 volume down requests to the TV, effectively setting the volume to 0. From there, as long as you *only* use cec-web to change the volume, it will remain consistent. If there is a receiver in your environment, the volume code in it's present state will not work for you, as everything is hardcoded to a TV. I have a receiver in another one of my environments, so I plan to add support for passing through the receiver volume at some point.
+
 * ``GET /volume`` - Get the current volume
 * ``PUT /volume/up`` - Increase volume
 * ``PUT /volume/step/:direction/:steps`` - Move volume in direction by X steps
