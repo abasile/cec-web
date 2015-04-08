@@ -57,6 +57,7 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.GET("/config", config)
 	r.GET("/info", info)
 	r.GET("/input", input_status)
 	r.PUT("/input/:number", input_change)
@@ -101,6 +102,10 @@ func main() {
 	}
 
 	r.Run(options.HTTP.Host + ":" + options.HTTP.Port)
+}
+
+func config(c *gin.Context) {
+	c.JSON(200, options)
 }
 
 func info(c *gin.Context) {
