@@ -77,7 +77,7 @@ func main() {
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
 
-	if options.Audio.ResetVolume {
+	if options.Audio.ResetVolume != false {
 		// Let's reset the volume level to 0
 		log.Println("Resetting volume to 0")
 		for i := 0; i < options.Audio.MaxVolume; i++ {
