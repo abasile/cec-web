@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type HTTPOptions struct {
@@ -25,6 +24,7 @@ type CECOptions struct {
 type AudioOptions struct {
 	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to use for volume control and status" default:"Audio" default:"TV"`
 	ResetVolume bool   `long:"reset-volume" description:"Whether to reset the volume to 0 at startup" default:"true"`
+	StartVolume int    `long:"initial-volume" description:"Provide an initial volume level" default:"0"`
 }
 
 type Options struct {
@@ -78,7 +78,7 @@ func main() {
 		log.Println("Not resetting volume to 0, assuming it is already at 0")
 	}
 
-	volume_level = 0
+	volume_level = options.Audio.StartVolume
 
 	log.Println("Volume has been set to 0")
 
