@@ -23,8 +23,9 @@ type CECOptions struct {
 
 type AudioOptions struct {
 	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to use for volume control and status" default:"Audio" default:"TV"`
-	ResetVolume bool   `long:"dont-zero-volume" description:"Whether to reset the volume to 0 at startup" default:"true"`
+	ResetVolume bool   `short:"z" long:"zero-volume" description:"Whether to reset the volume to 0 at startup" default:"false" default:"true"`
 	StartVolume int    `short:"v" long:"initial-volume" description:"Provide an initial volume level" default:"0"`
+	MaxVolume   int    `short:"c" long:"max-volume" description:"The maximum supported volume" default:"100"`
 }
 
 type Options struct {
@@ -47,7 +48,11 @@ func main() {
 	cec.Open(options.CEC.Adapter, options.CEC.Name, options.CEC.Type)
 
 	if cec.PollDevice(cec.GetLogicalAddressByName(options.Audio.AudioDevice)) != true {
-		log.Println("You said you had a(n) " + options.Audio.AudioDevice + " device but one cant be found!")
+		var word = "a"
+		if options.Audio.AudioDevice == "Audio" {
+			word = "an"
+		}
+		log.Println("You said you had " + word + " " + options.Audio.AudioDevice + " device but one cant be found!")
 		os.Exit(1)
 	}
 
@@ -74,7 +79,7 @@ func main() {
 	if options.Audio.ResetVolume {
 		// Let's reset the volume level to 0
 		log.Println("Resetting volume to 0")
-		for i := 0; i < 100; i++ {
+		for i := 0; i < options.Audio.MaxVolume; i++ {
 			addr := cec.GetLogicalAddressByName(options.Audio.AudioDevice)
 			log.Println("Sending VolumeDown")
 			cec.Key(addr, "VolumeDown")
@@ -182,8 +187,8 @@ func vol_set(c *gin.Context) {
 
 	log.Println("Wanted_level is " + strconv.Itoa(wanted_level) + " and volume_level is " + strconv.Itoa(volume_level))
 
-	if wanted_level > 100 {
-		c.String(400, "The maximum volume level is 100")
+	if wanted_level > options.Audio.MaxVolume {
+		c.String(400, "The maximum volume level is "+strconv.Itoa(options.Audio.MaxVolume))
 	} else if wanted_level > volume_level { // Requested level is greater then current volume level
 		log.Println("FIRST")
 		var final_level = wanted_level - volume_level
@@ -223,7 +228,7 @@ func vol_status(c *gin.Context) {
 }
 
 func vol_up(c *gin.Context) {
-	if volume_level == 100 {
+	if volume_level == options.Audio.MaxVolume {
 		c.String(400, "Volume already at maximum")
 	} else {
 		addr := cec.GetLogicalAddressByName(options.Audio.AudioDevice)
@@ -255,7 +260,7 @@ func vol_mute_status(c *gin.Context) {
 }
 
 func vol_reset(c *gin.Context) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < options.Audio.MaxVolume; i++ {
 		log.Println("Sending VolumeDown")
 		addr := cec.GetLogicalAddressByName(options.Audio.AudioDevice)
 
