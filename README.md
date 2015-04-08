@@ -12,141 +12,30 @@ Usage
 
     Usage:
       cec-web [OPTIONS]
-    
-    Application Options:
-      -i, --ip=      ip to listen on (127.0.0.1)
-      -p, --port=    tcp port to listen on (8080)
-      -a, --adapter= cec adapter to connect to [RPI, usb, ...]
-      -n, --name=    OSD name to announce on the cec bus (REST Gateway)
-      -t, --type=    The device type to announce [tv, recording, reserved, tuner, playback, audio] (tuner)
+
+    HTTP Server Options:
+      -i, --ip=             IP address to listen on (0.0.0.0)
+      -p, --port=           TCP port to listen on (8080)
+
+    CEC Options:
+      -a, --adapter=        CEC adapter to connect to (RPI)
+      -n, --name=           OSD name to announce on the CEC bus (cec-web)
+      -t, --type=           The device type to announce as (tv, recording, reserved, playback, audio,
+                            tuner)
+
+    Audio Options:
+      -d, --audio-device=   The audio device to use for volume control and status (Audio, TV)
+      -z, --zero-volume     Whether to reset the volume to 0 at startup (false, true)
+      -v, --initial-volume= Provide an initial volume level (0)
+      -c, --max-volume=     The maximum supported volume (100)
+
+    Help Options:
+      -h, --help            Show this help message
 
 
 JSON API
 ========
 
-The app provides the following JSON based RESTful API:
-
-## Scan CEC bus
-
-* ``GET /info`` - Information about all the connected devices on the CEC bus
-
-#### Resonse
-
-    HTTP/1.1 200 OK
-
-```json
-{
-  "Playback":{
-    "OSDName":"REST Gateway",
-    "Vendor":"Panasonic",
-    "LogicalAddress":4,
-    "ActiveSource":false,
-    "PowerStatus":"on",
-    "PhysicalAddress":"f.f.f.f"
-  },
-  "TV":{
-    "OSDName":"TV",
-    "Vendor":"Panasonic",
-    "LogicalAddress":0,
-    "ActiveSource":false,
-    "PowerStatus":"standby",
-    "PhysicalAddress":"0.0.0.0"
-  }
-}
-```
-
-## Get the current input
-
-* ``GET /input`` - Get the current input label, formatted for Roomie. If none, will return nothing (with a 200 status)
-
-#### Response
-
-    HTTP/1.1 200 OK
-`INPUT HDMI 1`
-
-## Power
-
-* ``GET /power/:device`` - Request device power status
-* ``PUT /power/:device`` - Power on device
-* ``DELETE /power/:device`` - Put device in standby
-
-``:device`` is the name of the device on the CEC bus (see ``GET /info``)
-
-#### Responses
-
-is powered on (PUT/GET)
-
-    HTTP/1.1 200
-`on`
-
-is in standby/no power (GET/DELETE);
-
-    HTTP/1.1 200
-`off`
-
-## Volume (not supported by all devices)
-
-CAVEAT: The volume code assumes that there is _not_ a receiver in your environment, so it does it's own volume tracking as there is no way in CEC to do volume tracking for devices other than a receiver. It's hacky, but it works well for me so far. When you start up cec-web and before it starts accepting requests, it will send 100 volume down requests to the TV, effectively setting the volume to 0. From there, as long as you *only* use cec-web to change the volume, it will remain consistent. If there is a receiver in your environment, the volume code in it's present state will not work for you, as everything is hardcoded to a TV. I have a receiver in another one of my environments, so I plan to add support for passing through the receiver volume at some point.
-
-* ``GET /volume`` - Get the current volume
-* ``PUT /volume/up`` - Increase volume
-* ``PUT /volume/step/:direction/:steps`` - Move volume in direction by X steps
-* ``PUT /volume/set/:level`` - Set volume to X level
-* ``PUT /volume/down`` - Reduce volume
-* ``PUT /volume/mute`` - Mute/unmute audio
-* ``GET /volume/mute`` - Get the current mute status
-
-> ``:direction`` is the direction to step the volume. Valid options are `up` or `down`
-> ``:steps`` is number of steps to change the volume by
-> ``:level`` is exact volume level to set
-
-#### Responses
-
-Volume up, Volume down, Volume mute (PUT)
-
-    HTTP/1.1 204 No Content
-
-Volume status (GET)
-    HTTP/1.1 200
-`10`
-
-Set volume to specific level, step volume up/down (PUT)
-    HTTP/1.1 200
-`10`
-
-Mute status (GET)
-    HTTP/1.1 200
-`true` or `false`
-
-## Remote control
-
-* ``PUT /key/:device/:key`` - Send key press command followed by key release
-
-> ``:device`` is the name of the device on the CEC bus (see ``GET /info``)
-> ``:key`` is the name (e.g. ``down``) or the keycode in hex (e.g. ``0x00``) of a remote key
-
-## Change the channel
-
-* ``PUT /key/:device/:channel`` - Change the channel. Just a conveinence function instead of pressing individual buttons
-
-> ``:device`` is the name of the device on the CEC bus (see ``GET /info``)
-> ``:channel`` is the channel number (e.g. ``123``)
-
-#### Response
-
-    HTTP/1.1 200 OK
-`123`
-
-## Raw CEC commands
-
-* ``POST /transmit`` - Send a list of CEC commands over the bus
-
-data example:
-```json
-[
-  "40:04",
-  "40:64:00:48:65:6C:6C:6F:20:77:6F:72:6C:64"
-]
-```
+Docs for the JSON API can be found at [Github Pages](https://robbiet480.github.io/cec-web/)
 
 Hint: Use [cec-o-matic](http://www.cec-o-matic.com/) to generate commands.
