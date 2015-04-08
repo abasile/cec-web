@@ -157,3 +157,57 @@ This endpoint will toggle the mute status and return the new mute status as a bo
 ### HTTP Request
 
 `PUT http://192.168.1.2:8080/volume/mute`
+
+## Reset Volume
+
+```shell
+curl -X PUT "http://192.168.1.2:8080/volume/reset"
+```
+
+```xml
+<key>Volume Reset</key>
+<string>PUT /volume/reset</string>
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+
+11
+```
+
+This endpoint will step the volume down to the MinVolume as specified in the configuration and return the new volume level (which should be MinVolume)
+
+### HTTP Request
+
+`PUT http://192.168.1.2:8080/volume/reset`
+
+## Set cec-web's volume level
+
+```shell
+curl -X PUT "http://192.168.1.2:8080/volume/force/10"
+```
+
+```xml
+<key>Volume Force</key>
+<string>PUT /volume/force/10</string>
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+
+10
+```
+
+This endpoint will set the internally tracked volume level to the level given and return the new volume level. Note that this will _not_ send any messages to the CEC bus and is meant as a conveinence function to sync cec-web's knowledge of volume with reality.
+
+### HTTP Request
+
+`PUT http://192.168.1.2:8080/volume/force/<level>`
+
+### URL Parameters
+
+| Parameter | Description                              |
+|-----------|------------------------------------------|
+| level     | The volume level                         |

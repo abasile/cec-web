@@ -11,11 +11,10 @@ toc_footers:
 
 includes:
   - core
+  - power
   - input
   - volume
-  - key
-  - channel
-  - transmit
+  - remote
   - errors
 
 search: true
