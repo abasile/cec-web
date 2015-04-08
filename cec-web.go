@@ -23,8 +23,8 @@ type CECOptions struct {
 
 type AudioOptions struct {
 	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to use for volume control and status" default:"Audio" default:"TV"`
-	ResetVolume bool   `long:"reset-volume" description:"Whether to reset the volume to 0 at startup" default:"true"`
-	StartVolume int    `long:"initial-volume" description:"Provide an initial volume level" default:"0"`
+	ResetVolume bool   `long:"dont-zero-volume" description:"Whether to reset the volume to 0 at startup" default:"true"`
+	StartVolume int    `short:"v" long:"initial-volume" description:"Provide an initial volume level" default:"0"`
 }
 
 type Options struct {
@@ -36,7 +36,7 @@ type Options struct {
 var options Options
 var parser = flags.NewParser(&options, flags.Default)
 
-var volume_level int
+var volume_level = options.Audio.StartVolume
 var input_number int
 var is_muted = false
 
@@ -45,6 +45,11 @@ func main() {
 		os.Exit(1)
 	}
 	cec.Open(options.CEC.Adapter, options.CEC.Name, options.CEC.Type)
+
+	if cec.PollDevice(cec.GetLogicalAddressByName(options.Audio.AudioDevice)) != true {
+		log.Println("You said you had a(n) " + options.Audio.AudioDevice + " device but one cant be found!")
+		os.Exit(1)
+	}
 
 	r := gin.Default()
 	r.GET("/info", info)
@@ -73,14 +78,12 @@ func main() {
 			addr := cec.GetLogicalAddressByName(options.Audio.AudioDevice)
 			log.Println("Sending VolumeDown")
 			cec.Key(addr, "VolumeDown")
+			volume_level = 0
 		}
+		log.Println("Volume has been set to 0")
 	} else {
 		log.Println("Not resetting volume to 0, assuming it is already at 0")
 	}
-
-	volume_level = options.Audio.StartVolume
-
-	log.Println("Volume has been set to 0")
 
 	log.Println("Getting the current active input")
 
