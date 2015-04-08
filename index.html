@@ -1,0 +1,586 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>API Reference</title>
+
+    <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+      <script src="javascripts/all.js" type="text/javascript"></script>
+
+      <script>
+        $(function() {
+          setupLanguages(["shell","xml"]);
+        });
+      </script>
+  </head>
+
+  <body class="index">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+      <h1 style="color: white; text-align: center;">cec-web</h1>
+        <div class="lang-selector">
+              <a href="#" data-language-name="shell">shell</a>
+              <a href="#" data-language-name="xml">xml</a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <div id="toc">
+      </div>
+        <ul class="toc-footer">
+            <li><a href='http://github.com/robbiet480/cec-web'>Github</a></li>
+            <li><a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a></li>
+        </ul>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="introduction">Introduction</h1>
+
+<p>Welcome to the cec-web API! cec-web is a bridge between HDMI-CEC and a Go based REST API, purpose built for use with <a href="http://roomieremote.com">Roomie Remote</a></p>
+
+<p>There are examples for all the API commands in both shell and XML (which should really be used for plists in Roomie Remote). You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
+
+          <h1 id="core">Core</h1>
+
+<h2 id="scan-the-cec-bus">Scan the CEC bus</h2>
+<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/info"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Info<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>GET /info<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json; charset=utf-8</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"Playback"</span><span class="p">:{</span><span class="w">
+    </span><span class="s2">"OSDName"</span><span class="p">:</span><span class="s2">"REST Gateway"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"Vendor"</span><span class="p">:</span><span class="s2">"Panasonic"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"LogicalAddress"</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"ActiveSource"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"PowerStatus"</span><span class="p">:</span><span class="s2">"on"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"PhysicalAddress"</span><span class="p">:</span><span class="s2">"f.f.f.f"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"TV"</span><span class="p">:{</span><span class="w">
+    </span><span class="s2">"OSDName"</span><span class="p">:</span><span class="s2">"TV"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"Vendor"</span><span class="p">:</span><span class="s2">"Panasonic"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"LogicalAddress"</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"ActiveSource"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"PowerStatus"</span><span class="p">:</span><span class="s2">"standby"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"PhysicalAddress"</span><span class="p">:</span><span class="s2">"0.0.0.0"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>This endpoint returns information about all the connected devices on the CEC bus</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET http://192.168.1.2:8080/config</code></p>
+
+<h2 id="get-the-configuration">Get the configuration</h2>
+<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/config"</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json; charset=utf-8</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"HTTP"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"Host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.0.0.0"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Port"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8080"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"CEC"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"Adapter"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RPI"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cec-web"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tuner"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"Audio"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"AudioDevice"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TV"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"ResetVolume"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"StartVolume"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"MaxVolume"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>This endpoint retrieves the configuration parameters used to start cec-web.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET http://192.168.1.2/config</code></p>
+
+          <h1 id="power">Power</h1>
+
+<h2 id="get-the-power-status-for-a-device">Get the power status for a device</h2>
+<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/power/TV"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.POWER STATUS<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>GET /power/TV<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+on
+</code></pre>
+
+<p>This endpoint returns the power status for a given device</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET http://192.168.1.2:8080/power/&lt;device&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>device</td>
+<td>A friendly name for a device on the CEC bus</td>
+</tr>
+</tbody></table>
+
+<h2 id="turn-a-device-on">Turn a device on</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/power/TV"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>POWER ON<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /power/TV<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+on
+</code></pre>
+
+<p>This endpoint turns the given device on</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/power/&lt;device&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>device</td>
+<td>A friendly name for a device on the CEC bus</td>
+</tr>
+</tbody></table>
+
+<h2 id="turn-a-device-off">Turn a device off</h2>
+<pre><code class="highlight shell">curl -X DELETE <span class="s2">"http://192.168.1.2:8080/power/TV"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>POWER OFF<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>DELETE /power/TV<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+off
+</code></pre>
+
+<p>This endpoint turns the given device off</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">DELETE http://192.168.1.2:8080/power/&lt;device&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>device</td>
+<td>A friendly name for a device on the CEC bus</td>
+</tr>
+</tbody></table>
+
+          <h1 id="input">Input</h1>
+
+<h2 id="get-the-current-input">Get the current input</h2>
+<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/input"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.INPUT STATUS<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>GET /input<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+INPUT HDMI 1
+</code></pre>
+
+<p>This endpoint returns the current input label, formatted for Roomie. If none, will return nothing (with a 200 status)</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET http://192.168.1.2:8080/config</code></p>
+
+<h2 id="change-the-input">Change the input</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/input/1"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.INPUT SET<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /input/1<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+INPUT HDMI 1
+</code></pre>
+
+<p>This endpoint will change the input and return the new input label, formatted for Roomie.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET http://192.168.1.2:8080/input/1</code></p>
+
+          <h1 id="volume">Volume</h1>
+
+<h2 id="get-the-current-volume-level">Get the current volume level</h2>
+<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/volume"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.VOLUME STATUS<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>GET /volume<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+10
+</code></pre>
+
+<p>This endpoint returns the current volume level.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET http://192.168.1.2:8080/volume</code></p>
+
+<h2 id="set-the-volume-level">Set the volume level</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/set/10"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.VOLUME SET<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /volume/set/10<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+10
+</code></pre>
+
+<p>This endpoint will set the volume to the level given and return the new volume level</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/set/&lt;level&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>level</td>
+<td>The number of steps to change the volume</td>
+</tr>
+</tbody></table>
+
+<h2 id="increment/decrement-the-volume-level">Increment/decrement the volume level</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/up"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>VOLUME UP<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /volume/up<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+11
+</code></pre>
+
+<p>This endpoint will change the volume level by 1 in the direction given and return the new volume level</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/&lt;direction&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Options</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>direction</td>
+<td>The direction to change the volume</td>
+<td>up, down</td>
+</tr>
+</tbody></table>
+
+<h2 id="step-the-volume-level">Step the volume level</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/step/up/10"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Volume +10<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /volume/step/up/10<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight plaintext">20
+</code></pre>
+
+<p>This endpoint will change the volume level by the number of steps given in the direction given and return the new volume level</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/step/&lt;direction&gt;/&lt;steps&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Options</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>direction</td>
+<td>The direction to change the volume</td>
+<td>up, down</td>
+</tr>
+<tr>
+<td>steps</td>
+<td>The number of steps to change the volume</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h2 id="get-the-mute-status">Get the mute status</h2>
+<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/volume/mute"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.MUTE STATUS<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>GET /volume/mute<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight plaintext">true
+</code></pre>
+
+<p>This endpoint will return the mute status as a boolean</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET http://192.168.1.2:8080/volume/mute</code></p>
+
+<h2 id="toggle-the-mute-status">Toggle the mute status</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/mute"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>MUTE TOGGLE<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /volume/mute<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+true
+</code></pre>
+
+<p>This endpoint will toggle the mute status and return the new mute status as a boolean</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/mute</code></p>
+
+<h2 id="reset-volume">Reset Volume</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/reset"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Volume Reset<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /volume/reset<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+11
+</code></pre>
+
+<p>This endpoint will step the volume down to the MinVolume as specified in the configuration and return the new volume level (which should be MinVolume)</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/reset</code></p>
+
+<h2 id="set-cec-web&#39;s-volume-level">Set cec-web&rsquo;s volume level</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/force/10"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Volume Force<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /volume/force/10<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+10
+</code></pre>
+
+<p>This endpoint will set the internally tracked volume level to the level given and return the new volume level. Note that this will <em>not</em> send any messages to the CEC bus and is meant as a conveinence function to sync cec-web&rsquo;s knowledge of volume with reality.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/force/&lt;level&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>level</td>
+<td>The volume level</td>
+</tr>
+</tbody></table>
+
+          <h1 id="remote-control">Remote Control</h1>
+
+<h2 id="send-key-code-to-cec-bus">Send key code to CEC bus</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/key/TV/PreviousChannel"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>PREVIOUS CHANNEL<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /key/TV/PreviousChannel<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+</code></pre>
+
+<p>This endpoint will send the given key code to the specified device and then release the key</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/key/&lt;device&gt;/&lt;key&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>device</td>
+<td>A friendly name for a device on the CEC bus</td>
+</tr>
+<tr>
+<td>key</td>
+<td>A key name (e.g. <code class="prettyprint">down</code>) or the keycode in hex (e.g. <code class="prettyprint">0x00</code>)</td>
+</tr>
+</tbody></table>
+
+<h2 id="change-the-channel">Change the channel</h2>
+<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/channel/TV/53"</span>
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.CHANNEL SET<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /channel/TV/53<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+53
+</code></pre>
+
+<p>This endpoint will split the given channel number and send each digit as an individual key press</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/channel/&lt;device&gt;/&lt;channel&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>device</td>
+<td>A friendly name for a device on the CEC bus</td>
+</tr>
+<tr>
+<td>channel</td>
+<td>A channel number</td>
+</tr>
+</tbody></table>
+
+<h2 id="transmit-raw-cec-commands">Transmit raw CEC commands</h2>
+<pre><code class="highlight shell">curl -X POST -d <span class="s1">'["3f:82:10:00"]'</span> -A <span class="s2">"Content-type: application/json"</span> http://192.168.1.2:8080/transmit
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>INPUT HDMI 1<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>POST /transmit
+  Content-type: application/json
+
+  ["3f:82:10:00"]
+<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+53
+</code></pre>
+
+<p>This endpoint will transmit the given commands to the CEC bus directly. Commands must be in JSON array format. </p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">POST http://192.168.1.2:8080/transmit</code></p>
+
+          <h1 id="errors">Errors</h1>
+
+<p>The cec-web API uses the following error codes:</p>
+
+<table><thead>
+<tr>
+<th>Error Code</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>400</td>
+<td>Bad Request &ndash; Invalid parameters passed</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Internal Server Error &ndash; CEC-Web had a problem. Try again later.</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="shell">shell</a>
+                <a href="#" data-language-name="xml">xml</a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
