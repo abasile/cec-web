@@ -22,7 +22,7 @@ This endpoint returns the current input label, formatted for Roomie. If none, wi
 
 ### HTTP Request
 
-`GET http://192.168.1.2:8080/config`
+`GET http://192.168.1.2:8080/input`
 
 ## Change the input
 
