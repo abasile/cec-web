@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type HTTPOptions struct {
@@ -74,6 +75,7 @@ func main() {
 	r.PUT("/volume/set/:level", vol_set)
 	r.PUT("/volume/force/:level", vol_force_set)
 	r.PUT("/key/:device/:key", key)
+	r.PUT("/multikey/:device/:key/:delay/:key2", multi_key)
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
 
@@ -280,6 +282,18 @@ func key(c *gin.Context) {
 	key := c.Params.ByName("key")
 
 	cec.Key(addr, key)
+	c.String(204, "")
+}
+
+func multi_key(c *gin.Context) {
+	addr := cec.GetLogicalAddressByName(c.Params.ByName("device"))
+	key := c.Params.ByName("key")
+	key_two := c.Params.ByName("key2")
+	delay, _ := strconv.Atoi(c.Params.ByName("delay"))
+
+	cec.Key(addr, key)
+	time.Sleep(time.Duration(delay) * time.Millisecond)
+	cec.Key(addr, key_two)
 	c.String(204, "")
 }
 
