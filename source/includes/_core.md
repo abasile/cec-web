@@ -39,7 +39,7 @@ This endpoint returns information about all the connected devices on the CEC bus
 
 ### HTTP Request
 
-`GET http://192.168.1.2:8080/config`
+`GET http://192.168.1.2:8080/info`
 
 ## Get the configuration
 
