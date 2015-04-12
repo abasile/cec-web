@@ -29,6 +29,37 @@ This endpoint will send the given key code to the specified device and then rele
 | device    | A friendly name for a device on the CEC bus                  |
 | key       | A key name (e.g. `down`) or the keycode in hex (e.g. `0x00`) |
 
+## Send multiple keys to CEC bus
+
+```shell
+curl -X PUT "http://192.168.1.2:8080/multikey/TV/VolumeUp/0/VolumeDown"
+```
+
+```xml
+<key>MUTE OFF</key>
+<string>PUT /multikey/TV/VolumeUp/0/VolumeDown</string>
+```
+
+```http
+HTTP/1.1 204 No Content
+Content-Type: text/plain; charset=utf-8
+```
+
+This endpoint will send the given key codes to the specified device with a delay between the first and second code
+
+### HTTP Request
+
+`PUT http://192.168.1.2:8080/mutlikey/<device>/<key1>/<delay>/<key2>`
+
+### URL Parameters
+
+| Parameter | Description                                                  |
+|-----------|--------------------------------------------------------------|
+| device    | A friendly name for a device on the CEC bus                  |
+| key1      | A key name (e.g. `down`) or the keycode in hex (e.g. `0x00`) |
+| delay     | The delay between the two key presses, in milliseconds       |
+| key2      | A key name (e.g. `down`) or the keycode in hex (e.g. `0x00`) |
+
 ## Change the channel
 
 ```shell
