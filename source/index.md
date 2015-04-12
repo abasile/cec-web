@@ -15,6 +15,7 @@ includes:
   - input
   - volume
   - remote
+  - keys
   - errors
 
 search: true
