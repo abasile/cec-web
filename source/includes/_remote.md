@@ -109,8 +109,6 @@ curl -X POST -d '["3f:82:10:00"]' -A "Content-type: application/json" http://192
 ```http
 HTTP/1.1 204 No Content
 Content-Type: text/plain; charset=utf-8
-
-53
 ```
 
 This endpoint will transmit the given commands to the CEC bus directly. Commands must be in JSON array format. 
