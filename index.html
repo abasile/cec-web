@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>API Reference</title>
+    <title>CEC-Web API Reference</title>
 
     <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
     <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
@@ -28,8 +28,8 @@
     <div class="tocify-wrapper">
       <h1 style="color: white; text-align: center;">cec-web</h1>
         <div class="lang-selector">
-              <a href="#" data-language-name="shell">shell</a>
-              <a href="#" data-language-name="xml">xml</a>
+              <a href="#" data-language-name="shell">cURL</a>
+              <a href="#" data-language-name="xml">Property List</a>
         </div>
         <div class="search">
           <input type="text" class="search" id="input-search" placeholder="Search">
@@ -47,14 +47,55 @@
       <div class="content">
         <h1 id="introduction">Introduction</h1>
 
-<p>Welcome to the cec-web API! cec-web is a bridge between HDMI-CEC and a Go based REST API, purpose built for use with <a href="http://roomieremote.com">Roomie Remote</a></p>
+<p>Welcome to the cec-web API! cec-web is a bridge between <a href="https://en.wikipedia.org/wiki/HDMI#CEC">HDMI-CEC</a> and a Go based REST API, purpose built for use with <a href="http://roomieremote.com">Roomie Remote</a></p>
 
-<p>There are examples for all the API commands in both shell and XML (which should really be used for plists in Roomie Remote). You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
+<p>There are examples for all the API commands in both cURL and <a href="https://en.wikipedia.org/wiki/Property_list">property list</a> (for use with Roomie Remote) flavors. You can view code examples in the column to the right, and you can switch the programming language of the examples with the tabs in the top right of that column.</p>
+
+          <h1 id="getting-started">Getting Started</h1>
+
+<h2 id="requirements">Requirements</h2>
+
+<ul>
+<li>Go installed</li>
+<li>A device capable of running <a href="http://libcec.pulse-eight.com/">libcec</a> such as a Raspberry Pi or the <a href="https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter">Pulse-Eight USB-CEC Adapter</a></li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+
+<ol>
+<li>Clone this repository</li>
+<li>Run <code class="prettyprint">go build cec-web.go</code> in the resulting folder</li>
+<li>Run the resulting binary: <code class="prettyprint">./cec-web</code></li>
+</ol>
+
+<h2 id="command-line-options">Command Line Options</h2>
+<pre><code class="highlight plaintext">Usage:
+  cec-web [OPTIONS]
+
+HTTP Server Options:
+  -i, --ip=             IP address to listen on (0.0.0.0)
+  -p, --port=           TCP port to listen on (8080)
+
+CEC Options:
+  -a, --adapter=        CEC adapter to connect to (RPI)
+  -n, --name=           OSD name to announce on the CEC bus (cec-web)
+  -t, --type=           The device type to announce as (tv, recording, reserved, playback, audio,
+                        tuner)
+
+Audio Options:
+  -d, --audio-device=   The audio device to use for volume control and status (Audio, TV)
+  -z, --zero-volume     Whether to reset the volume to 0 at startup (false, true)
+  -v, --initial-volume= Provide an initial volume level (0)
+  -c, --max-volume=     The maximum supported volume (100)
+
+Help Options:
+  -h, --help            Show this help message
+</code></pre>
 
           <h1 id="core">Core</h1>
 
 <h2 id="scan-the-cec-bus">Scan the CEC bus</h2>
-<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/info"</span>
+<pre><code class="highlight shell">curl http://192.168.1.2:8080/info
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Info<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>GET /info<span class="nt">&lt;/string&gt;</span>
@@ -86,10 +127,10 @@
 
 <h3 id="http-request">HTTP Request</h3>
 
-<p><code class="prettyprint">GET http://192.168.1.2:8080/config</code></p>
+<p><code class="prettyprint">GET http://192.168.1.2:8080/info</code></p>
 
 <h2 id="get-the-configuration">Get the configuration</h2>
-<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/config"</span>
+<pre><code class="highlight shell">curl http://192.168.1.2:8080/config
 </code></pre>
 <pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json; charset=utf-8</span>
@@ -117,12 +158,12 @@
 
 <h3 id="http-request">HTTP Request</h3>
 
-<p><code class="prettyprint">GET http://192.168.1.2/config</code></p>
+<p><code class="prettyprint">GET http://192.168.1.2:8080/config</code></p>
 
           <h1 id="power">Power</h1>
 
 <h2 id="get-the-power-status-for-a-device">Get the power status for a device</h2>
-<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/power/TV"</span>
+<pre><code class="highlight shell">curl http://192.168.1.2:8080/power/TV
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.POWER STATUS<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>GET /power/TV<span class="nt">&lt;/string&gt;</span>
@@ -154,7 +195,7 @@ on
 </tbody></table>
 
 <h2 id="turn-a-device-on">Turn a device on</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/power/TV"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/power/TV
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>POWER ON<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /power/TV<span class="nt">&lt;/string&gt;</span>
@@ -186,7 +227,7 @@ on
 </tbody></table>
 
 <h2 id="turn-a-device-off">Turn a device off</h2>
-<pre><code class="highlight shell">curl -X DELETE <span class="s2">"http://192.168.1.2:8080/power/TV"</span>
+<pre><code class="highlight shell">curl -X DELETE http://192.168.1.2:8080/power/TV
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>POWER OFF<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>DELETE /power/TV<span class="nt">&lt;/string&gt;</span>
@@ -220,7 +261,7 @@ off
           <h1 id="input">Input</h1>
 
 <h2 id="get-the-current-input">Get the current input</h2>
-<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/input"</span>
+<pre><code class="highlight shell">curl http://192.168.1.2:8080/input
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.INPUT STATUS<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>GET /input<span class="nt">&lt;/string&gt;</span>
@@ -235,10 +276,10 @@ INPUT HDMI 1
 
 <h3 id="http-request">HTTP Request</h3>
 
-<p><code class="prettyprint">GET http://192.168.1.2:8080/config</code></p>
+<p><code class="prettyprint">GET http://192.168.1.2:8080/input</code></p>
 
 <h2 id="change-the-input">Change the input</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/input/1"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/input/1
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.INPUT SET<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /input/1<span class="nt">&lt;/string&gt;</span>
@@ -253,12 +294,12 @@ INPUT HDMI 1
 
 <h3 id="http-request">HTTP Request</h3>
 
-<p><code class="prettyprint">GET http://192.168.1.2:8080/input/1</code></p>
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/input/1</code></p>
 
           <h1 id="volume">Volume</h1>
 
 <h2 id="get-the-current-volume-level">Get the current volume level</h2>
-<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/volume"</span>
+<pre><code class="highlight shell">curl http://192.168.1.2:8080/volume
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.VOLUME STATUS<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>GET /volume<span class="nt">&lt;/string&gt;</span>
@@ -276,7 +317,7 @@ INPUT HDMI 1
 <p><code class="prettyprint">GET http://192.168.1.2:8080/volume</code></p>
 
 <h2 id="set-the-volume-level">Set the volume level</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/set/10"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/volume/set/10
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.VOLUME SET<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /volume/set/10<span class="nt">&lt;/string&gt;</span>
@@ -308,18 +349,16 @@ INPUT HDMI 1
 </tbody></table>
 
 <h2 id="increment/decrement-the-volume-level">Increment/decrement the volume level</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/up"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/volume/up
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>VOLUME UP<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /volume/up<span class="nt">&lt;/string&gt;</span>
 </code></pre>
-<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
-
-11
 </code></pre>
 
-<p>This endpoint will change the volume level by 1 in the direction given and return the new volume level</p>
+<p>This endpoint will change the volume level by 1 in the direction given.</p>
 
 <h3 id="http-request">HTTP Request</h3>
 
@@ -342,15 +381,16 @@ INPUT HDMI 1
 </tbody></table>
 
 <h2 id="step-the-volume-level">Step the volume level</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/step/up/10"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/volume/step/up/10
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Volume +10<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /volume/step/up/10<span class="nt">&lt;/string&gt;</span>
 </code></pre>
-<pre><code class="highlight plaintext">20
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
 </code></pre>
 
-<p>This endpoint will change the volume level by the number of steps given in the direction given and return the new volume level</p>
+<p>This endpoint will change the volume level by the number of steps given in the direction given</p>
 
 <h3 id="http-request">HTTP Request</h3>
 
@@ -378,12 +418,15 @@ INPUT HDMI 1
 </tbody></table>
 
 <h2 id="get-the-mute-status">Get the mute status</h2>
-<pre><code class="highlight shell">curl <span class="s2">"http://192.168.1.2:8080/volume/mute"</span>
+<pre><code class="highlight shell">curl http://192.168.1.2:8080/volume/mute
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.MUTE STATUS<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>GET /volume/mute<span class="nt">&lt;/string&gt;</span>
 </code></pre>
-<pre><code class="highlight plaintext">true
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+
+true
 </code></pre>
 
 <p>This endpoint will return the mute status as a boolean</p>
@@ -393,25 +436,23 @@ INPUT HDMI 1
 <p><code class="prettyprint">GET http://192.168.1.2:8080/volume/mute</code></p>
 
 <h2 id="toggle-the-mute-status">Toggle the mute status</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/mute"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/volume/mute
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>MUTE TOGGLE<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /volume/mute<span class="nt">&lt;/string&gt;</span>
 </code></pre>
-<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
-
-true
 </code></pre>
 
-<p>This endpoint will toggle the mute status and return the new mute status as a boolean</p>
+<p>This endpoint will toggle the mute status.</p>
 
 <h3 id="http-request">HTTP Request</h3>
 
 <p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/mute</code></p>
 
 <h2 id="reset-volume">Reset Volume</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/reset"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/volume/reset
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Volume Reset<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /volume/reset<span class="nt">&lt;/string&gt;</span>
@@ -429,18 +470,16 @@ true
 <p><code class="prettyprint">PUT http://192.168.1.2:8080/volume/reset</code></p>
 
 <h2 id="set-cec-web&#39;s-volume-level">Set cec-web&rsquo;s volume level</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/volume/force/10"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/volume/force/10
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>Volume Force<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /volume/force/10<span class="nt">&lt;/string&gt;</span>
 </code></pre>
-<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
-
-10
 </code></pre>
 
-<p>This endpoint will set the internally tracked volume level to the level given and return the new volume level. Note that this will <em>not</em> send any messages to the CEC bus and is meant as a conveinence function to sync cec-web&rsquo;s knowledge of volume with reality.</p>
+<p>This endpoint will set the internally tracked volume level to the level given. Note that this will <em>not</em> send any messages to the CEC bus and is meant as a conveinence function to sync cec-web&rsquo;s knowledge of volume with reality.</p>
 
 <h3 id="http-request">HTTP Request</h3>
 
@@ -463,7 +502,7 @@ true
           <h1 id="remote-control">Remote Control</h1>
 
 <h2 id="send-key-code-to-cec-bus">Send key code to CEC bus</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/key/TV/PreviousChannel"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/key/TV/PreviousChannel
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>PREVIOUS CHANNEL<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /key/TV/PreviousChannel<span class="nt">&lt;/string&gt;</span>
@@ -492,12 +531,54 @@ true
 </tr>
 <tr>
 <td>key</td>
-<td>A key name (e.g. <code class="prettyprint">down</code>) or the keycode in hex (e.g. <code class="prettyprint">0x00</code>)</td>
+<td>A valid <a href="#keys">key</a></td>
+</tr>
+</tbody></table>
+
+<h2 id="send-multiple-keys-to-cec-bus">Send multiple keys to CEC bus</h2>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/multikey/TV/VolumeUp/0/VolumeDown
+</code></pre>
+<pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>MUTE OFF<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;string&gt;</span>PUT /multikey/TV/VolumeUp/0/VolumeDown<span class="nt">&lt;/string&gt;</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
+</code></pre>
+
+<p>This endpoint will send the given key codes to the specified device with a delay between the first and second code</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">PUT http://192.168.1.2:8080/mutlikey/&lt;device&gt;/&lt;key1&gt;/&lt;delay&gt;/&lt;key2&gt;</code></p>
+
+<h3 id="url-parameters">URL Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>device</td>
+<td>A friendly name for a device on the CEC bus</td>
+</tr>
+<tr>
+<td>key1</td>
+<td>A valid <a href="#keys">key</a></td>
+</tr>
+<tr>
+<td>delay</td>
+<td>The delay between the two key presses, in milliseconds</td>
+</tr>
+<tr>
+<td>key2</td>
+<td>A valid <a href="#keys">key</a></td>
 </tr>
 </tbody></table>
 
 <h2 id="change-the-channel">Change the channel</h2>
-<pre><code class="highlight shell">curl -X PUT <span class="s2">"http://192.168.1.2:8080/channel/TV/53"</span>
+<pre><code class="highlight shell">curl -X PUT http://192.168.1.2:8080/channel/TV/53
 </code></pre>
 <pre><code class="highlight xml"><span class="nt">&lt;key&gt;</span>.CHANNEL SET<span class="nt">&lt;/key&gt;</span>
 <span class="nt">&lt;string&gt;</span>PUT /channel/TV/53<span class="nt">&lt;/string&gt;</span>
@@ -544,8 +625,6 @@ true
 </code></pre>
 <pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">text/plain; charset=utf-8</span>
-
-53
 </code></pre>
 
 <p>This endpoint will transmit the given commands to the CEC bus directly. Commands must be in JSON array format. </p>
@@ -553,6 +632,338 @@ true
 <h3 id="http-request">HTTP Request</h3>
 
 <p><code class="prettyprint">POST http://192.168.1.2:8080/transmit</code></p>
+
+          <h1 id="keys">Keys</h1>
+
+<p>Here&rsquo;s a list of recognized keys. For endpoints like <code class="prettyprint">/key</code> you can pass in the Code or the Name.</p>
+
+<table><thead>
+<tr>
+<th>Code</th>
+<th>Name</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>0x00</td>
+<td>Select</td>
+</tr>
+<tr>
+<td>0x01</td>
+<td>Up</td>
+</tr>
+<tr>
+<td>0x02</td>
+<td>Down</td>
+</tr>
+<tr>
+<td>0x03</td>
+<td>Left</td>
+</tr>
+<tr>
+<td>0x04</td>
+<td>Right</td>
+</tr>
+<tr>
+<td>0x05</td>
+<td>RightUp</td>
+</tr>
+<tr>
+<td>0x06</td>
+<td>RightDown</td>
+</tr>
+<tr>
+<td>0x07</td>
+<td>LeftUp</td>
+</tr>
+<tr>
+<td>0x08</td>
+<td>LeftDown</td>
+</tr>
+<tr>
+<td>0x09</td>
+<td>RootMenu</td>
+</tr>
+<tr>
+<td>0x0A</td>
+<td>SetupMenu</td>
+</tr>
+<tr>
+<td>0x0B</td>
+<td>ContentsMenu</td>
+</tr>
+<tr>
+<td>0x0C</td>
+<td>FavoriteMenu</td>
+</tr>
+<tr>
+<td>0x0D</td>
+<td>Exit</td>
+</tr>
+<tr>
+<td>0x20</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0x21</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0x22</td>
+<td>2</td>
+</tr>
+<tr>
+<td>0x23</td>
+<td>3</td>
+</tr>
+<tr>
+<td>0x24</td>
+<td>4</td>
+</tr>
+<tr>
+<td>0x25</td>
+<td>5</td>
+</tr>
+<tr>
+<td>0x26</td>
+<td>6</td>
+</tr>
+<tr>
+<td>0x27</td>
+<td>7</td>
+</tr>
+<tr>
+<td>0x28</td>
+<td>8</td>
+</tr>
+<tr>
+<td>0x29</td>
+<td>9</td>
+</tr>
+<tr>
+<td>0x2A</td>
+<td>Dot</td>
+</tr>
+<tr>
+<td>0x2B</td>
+<td>Enter</td>
+</tr>
+<tr>
+<td>0x2C</td>
+<td>Clear</td>
+</tr>
+<tr>
+<td>0x2F</td>
+<td>NextFavorite</td>
+</tr>
+<tr>
+<td>0x30</td>
+<td>ChannelUp</td>
+</tr>
+<tr>
+<td>0x31</td>
+<td>ChannelDown</td>
+</tr>
+<tr>
+<td>0x32</td>
+<td>PreviousChannel</td>
+</tr>
+<tr>
+<td>0x33</td>
+<td>SoundSelect</td>
+</tr>
+<tr>
+<td>0x34</td>
+<td>InputSelect</td>
+</tr>
+<tr>
+<td>0x35</td>
+<td>DisplayInformation</td>
+</tr>
+<tr>
+<td>0x36</td>
+<td>Help</td>
+</tr>
+<tr>
+<td>0x37</td>
+<td>PageUp</td>
+</tr>
+<tr>
+<td>0x38</td>
+<td>PageDown</td>
+</tr>
+<tr>
+<td>0x40</td>
+<td>Power</td>
+</tr>
+<tr>
+<td>0x41</td>
+<td>VolumeUp</td>
+</tr>
+<tr>
+<td>0x42</td>
+<td>VolumeDown</td>
+</tr>
+<tr>
+<td>0x43</td>
+<td>Mute</td>
+</tr>
+<tr>
+<td>0x44</td>
+<td>Play</td>
+</tr>
+<tr>
+<td>0x45</td>
+<td>Stop</td>
+</tr>
+<tr>
+<td>0x46</td>
+<td>Pause</td>
+</tr>
+<tr>
+<td>0x47</td>
+<td>Record</td>
+</tr>
+<tr>
+<td>0x48</td>
+<td>Rewind</td>
+</tr>
+<tr>
+<td>0x49</td>
+<td>FastForward</td>
+</tr>
+<tr>
+<td>0x4A</td>
+<td>Eject</td>
+</tr>
+<tr>
+<td>0x4B</td>
+<td>Forward</td>
+</tr>
+<tr>
+<td>0x4C</td>
+<td>Backward</td>
+</tr>
+<tr>
+<td>0x4D</td>
+<td>StopRecord</td>
+</tr>
+<tr>
+<td>0x4E</td>
+<td>PauseRecord</td>
+</tr>
+<tr>
+<td>0x50</td>
+<td>Angle</td>
+</tr>
+<tr>
+<td>0x51</td>
+<td>SubPicture</td>
+</tr>
+<tr>
+<td>0x52</td>
+<td>VideoOnDemand</td>
+</tr>
+<tr>
+<td>0x53</td>
+<td>ElectronicProgramGuide</td>
+</tr>
+<tr>
+<td>0x54</td>
+<td>TimerProgramming</td>
+</tr>
+<tr>
+<td>0x55</td>
+<td>InitialConfiguration</td>
+</tr>
+<tr>
+<td>0x60</td>
+<td>PlayFunction</td>
+</tr>
+<tr>
+<td>0x61</td>
+<td>PausePlay</td>
+</tr>
+<tr>
+<td>0x62</td>
+<td>RecordFunction</td>
+</tr>
+<tr>
+<td>0x63</td>
+<td>PauseRecordFunction</td>
+</tr>
+<tr>
+<td>0x64</td>
+<td>StopFunction</td>
+</tr>
+<tr>
+<td>0x65</td>
+<td>Mute</td>
+</tr>
+<tr>
+<td>0x66</td>
+<td>RestoreVolume</td>
+</tr>
+<tr>
+<td>0x67</td>
+<td>Tune</td>
+</tr>
+<tr>
+<td>0x68</td>
+<td>SelectMedia</td>
+</tr>
+<tr>
+<td>0x69</td>
+<td>SelectAvInput</td>
+</tr>
+<tr>
+<td>0x6A</td>
+<td>SelectAudioInput</td>
+</tr>
+<tr>
+<td>0x6B</td>
+<td>PowerToggle</td>
+</tr>
+<tr>
+<td>0x6C</td>
+<td>PowerOff</td>
+</tr>
+<tr>
+<td>0x6D</td>
+<td>PowerOn</td>
+</tr>
+<tr>
+<td>0x71</td>
+<td>Blue</td>
+</tr>
+<tr>
+<td>0X72</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>0x73</td>
+<td>Green</td>
+</tr>
+<tr>
+<td>0x74</td>
+<td>Yellow</td>
+</tr>
+<tr>
+<td>0x75</td>
+<td>F5</td>
+</tr>
+<tr>
+<td>0x76</td>
+<td>Data</td>
+</tr>
+<tr>
+<td>0x91</td>
+<td>AnReturn</td>
+</tr>
+<tr>
+<td>0x96</td>
+<td>Max</td>
+</tr>
+</tbody></table>
 
           <h1 id="errors">Errors</h1>
 
@@ -577,8 +988,8 @@ true
       </div>
       <div class="dark-box">
           <div class="lang-selector">
-                <a href="#" data-language-name="shell">shell</a>
-                <a href="#" data-language-name="xml">xml</a>
+                <a href="#" data-language-name="shell">cURL</a>
+                <a href="#" data-language-name="xml">Property List</a>
           </div>
       </div>
     </div>
