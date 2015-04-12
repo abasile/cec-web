@@ -3,7 +3,7 @@
 ## Get the power status for a device
 
 ```shell
-curl "http://192.168.1.2:8080/power/TV"
+curl http://192.168.1.2:8080/power/TV
 ```
 
 ```xml
@@ -33,7 +33,7 @@ This endpoint returns the power status for a given device
 ## Turn a device on
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/power/TV"
+curl -X PUT http://192.168.1.2:8080/power/TV
 ```
 
 ```xml
@@ -63,7 +63,7 @@ This endpoint turns the given device on
 ## Turn a device off
 
 ```shell
-curl -X DELETE "http://192.168.1.2:8080/power/TV"
+curl -X DELETE http://192.168.1.2:8080/power/TV
 ```
 
 ```xml

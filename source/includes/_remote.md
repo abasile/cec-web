@@ -3,7 +3,7 @@
 ## Send key code to CEC bus
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/key/TV/PreviousChannel"
+curl -X PUT http://192.168.1.2:8080/key/TV/PreviousChannel
 ```
 
 ```xml
@@ -27,12 +27,12 @@ This endpoint will send the given key code to the specified device and then rele
 | Parameter | Description                                                  |
 |-----------|--------------------------------------------------------------|
 | device    | A friendly name for a device on the CEC bus                  |
-| key       | A key name (e.g. `down`) or the keycode in hex (e.g. `0x00`) |
+| key       | A valid [key](#keys)                                         |
 
 ## Send multiple keys to CEC bus
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/multikey/TV/VolumeUp/0/VolumeDown"
+curl -X PUT http://192.168.1.2:8080/multikey/TV/VolumeUp/0/VolumeDown
 ```
 
 ```xml
@@ -56,14 +56,14 @@ This endpoint will send the given key codes to the specified device with a delay
 | Parameter | Description                                                  |
 |-----------|--------------------------------------------------------------|
 | device    | A friendly name for a device on the CEC bus                  |
-| key1      | A key name (e.g. `down`) or the keycode in hex (e.g. `0x00`) |
+| key1      | A valid [key](#keys)                                         |
 | delay     | The delay between the two key presses, in milliseconds       |
-| key2      | A key name (e.g. `down`) or the keycode in hex (e.g. `0x00`) |
+| key2      | A valid [key](#keys)                                         |
 
 ## Change the channel
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/channel/TV/53"
+curl -X PUT http://192.168.1.2:8080/channel/TV/53
 ```
 
 ```xml

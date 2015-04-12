@@ -1,4 +1,4 @@
-# Keymap
+# Keys
 
 Here's a list of recognized keys. For endpoints like `/key` you can pass in the Code or the Name.
 

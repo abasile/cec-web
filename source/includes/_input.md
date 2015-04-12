@@ -3,7 +3,7 @@
 ## Get the current input
 
 ```shell
-curl "http://192.168.1.2:8080/input"
+curl http://192.168.1.2:8080/input
 ```
 
 ```xml
@@ -27,7 +27,7 @@ This endpoint returns the current input label, formatted for Roomie. If none, wi
 ## Change the input
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/input/1"
+curl -X PUT http://192.168.1.2:8080/input/1
 ```
 
 ```xml
@@ -46,4 +46,4 @@ This endpoint will change the input and return the new input label, formatted fo
 
 ### HTTP Request
 
-`GET http://192.168.1.2:8080/input/1`
+`PUT http://192.168.1.2:8080/input/1`

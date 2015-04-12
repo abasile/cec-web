@@ -3,7 +3,7 @@
 ## Scan the CEC bus
 
 ```shell
-curl "http://192.168.1.2:8080/info"
+curl http://192.168.1.2:8080/info
 ```
 
 ```xml
@@ -44,7 +44,7 @@ This endpoint returns information about all the connected devices on the CEC bus
 ## Get the configuration
 
 ```shell
-curl "http://192.168.1.2:8080/config"
+curl http://192.168.1.2:8080/config
 ```
 
 ```http

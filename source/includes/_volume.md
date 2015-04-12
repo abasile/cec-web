@@ -3,7 +3,7 @@
 ## Get the current volume level
 
 ```shell
-curl "http://192.168.1.2:8080/volume"
+curl http://192.168.1.2:8080/volume
 ```
 
 ```xml
@@ -27,7 +27,7 @@ This endpoint returns the current volume level.
 ## Set the volume level
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/volume/set/10"
+curl -X PUT http://192.168.1.2:8080/volume/set/10
 ```
 
 ```xml
@@ -58,7 +58,7 @@ This endpoint will set the volume to the level given and return the new volume l
 ## Increment/decrement the volume level
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/volume/up"
+curl -X PUT http://192.168.1.2:8080/volume/up
 ```
 
 ```xml
@@ -67,13 +67,11 @@ curl -X PUT "http://192.168.1.2:8080/volume/up"
 ```
 
 ```http
-HTTP/1.1 200 OK
+HTTP/1.1 204 No Content
 Content-Type: text/plain; charset=utf-8
-
-11
 ```
 
-This endpoint will change the volume level by 1 in the direction given and return the new volume level
+This endpoint will change the volume level by 1 in the direction given.
 
 ### HTTP Request
 
@@ -88,7 +86,7 @@ This endpoint will change the volume level by 1 in the direction given and retur
 ## Step the volume level
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/volume/step/up/10"
+curl -X PUT http://192.168.1.2:8080/volume/step/up/10
 ```
 
 ```xml
@@ -96,11 +94,12 @@ curl -X PUT "http://192.168.1.2:8080/volume/step/up/10"
 <string>PUT /volume/step/up/10</string>
 ```
 
-```
-20
+```http
+HTTP/1.1 204 No Content
+Content-Type: text/plain; charset=utf-8
 ```
 
-This endpoint will change the volume level by the number of steps given in the direction given and return the new volume level
+This endpoint will change the volume level by the number of steps given in the direction given
 
 ### HTTP Request
 
@@ -116,7 +115,7 @@ This endpoint will change the volume level by the number of steps given in the d
 ## Get the mute status
 
 ```shell
-curl "http://192.168.1.2:8080/volume/mute"
+curl http://192.168.1.2:8080/volume/mute
 ```
 
 ```xml
@@ -124,7 +123,10 @@ curl "http://192.168.1.2:8080/volume/mute"
 <string>GET /volume/mute</string>
 ```
 
-```
+```http
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+
 true
 ```
 
@@ -137,7 +139,7 @@ This endpoint will return the mute status as a boolean
 ## Toggle the mute status
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/volume/mute"
+curl -X PUT http://192.168.1.2:8080/volume/mute
 ```
 
 ```xml
@@ -146,13 +148,11 @@ curl -X PUT "http://192.168.1.2:8080/volume/mute"
 ```
 
 ```http
-HTTP/1.1 200 OK
+HTTP/1.1 204 No Content
 Content-Type: text/plain; charset=utf-8
-
-true
 ```
 
-This endpoint will toggle the mute status and return the new mute status as a boolean
+This endpoint will toggle the mute status.
 
 ### HTTP Request
 
@@ -161,7 +161,7 @@ This endpoint will toggle the mute status and return the new mute status as a bo
 ## Reset Volume
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/volume/reset"
+curl -X PUT http://192.168.1.2:8080/volume/reset
 ```
 
 ```xml
@@ -185,7 +185,7 @@ This endpoint will step the volume down to the MinVolume as specified in the con
 ## Set cec-web's volume level
 
 ```shell
-curl -X PUT "http://192.168.1.2:8080/volume/force/10"
+curl -X PUT http://192.168.1.2:8080/volume/force/10
 ```
 
 ```xml
@@ -194,13 +194,11 @@ curl -X PUT "http://192.168.1.2:8080/volume/force/10"
 ```
 
 ```http
-HTTP/1.1 200 OK
+HTTP/1.1 204 No Content
 Content-Type: text/plain; charset=utf-8
-
-10
 ```
 
-This endpoint will set the internally tracked volume level to the level given and return the new volume level. Note that this will _not_ send any messages to the CEC bus and is meant as a conveinence function to sync cec-web's knowledge of volume with reality.
+This endpoint will set the internally tracked volume level to the level given. Note that this will _not_ send any messages to the CEC bus and is meant as a conveinence function to sync cec-web's knowledge of volume with reality.
 
 ### HTTP Request
 
