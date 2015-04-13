@@ -24,7 +24,7 @@ type CECOptions struct {
 
 type AudioOptions struct {
 	AudioDevice string `short:"d" long:"audio-device" description:"The audio device to use for volume control and status" default:"Audio" default:"TV"`
-	ResetVolume bool   `short:"z" long:"zero-volume" description:"Whether to reset the volume to 0 at startup" default:"false" default:"true"`
+	ResetVolume bool   `short:"z" long:"do-not-zero-volume" description:"Whether to reset the volume to 0 at startup"`
 	StartVolume int    `short:"v" long:"initial-volume" description:"Provide an initial volume level" default:"0"`
 	MaxVolume   int    `short:"c" long:"max-volume" description:"The maximum supported volume" default:"100"`
 }
@@ -79,7 +79,7 @@ func main() {
 	r.PUT("/channel/:device/:channel", change_channel)
 	r.POST("/transmit", transmit)
 
-	if options.Audio.ResetVolume != false {
+	if options.Audio.ResetVolume != true {
 		// Let's reset the volume level to 0
 		log.Println("Resetting volume to 0")
 		for i := 0; i < options.Audio.MaxVolume; i++ {
