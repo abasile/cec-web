@@ -95,7 +95,7 @@ func main() {
 	r.PUT("/volume/force/:level", vol_force_set)
 	r.PUT("/key/:device/:key", CheckForDevice(), key)
 	r.PUT("/multikey/:device/:key/:delay/:key2", CheckForDevice(), multi_key)
-	r.PUT("/channel/:device/:channel", change_channel)
+	r.PUT("/channel/:device/:channel", CheckForDevice(), change_channel)
 	r.POST("/transmit", transmit)
 
 	if options.Audio.ResetVolume != true {
@@ -177,10 +177,13 @@ func input_status(c *gin.Context) {
 
 func input_change(c *gin.Context) {
 	input := c.Params.ByName("number")
-	cec.Transmit("3f:82:" + input + "0:00")
-	input_atoi, _ := strconv.Atoi(input)
-	input_number = int(input_atoi)
-	c.String(200, "INPUT HDMI "+input)
+	if resp := cec.Transmit("3f:82:" + input + "0:00"); resp != nil {
+		c.Fail(500, resp)
+	} else {
+		input_atoi, _ := strconv.Atoi(input)
+		input_number = int(input_atoi)
+		c.String(200, "INPUT HDMI "+input)
+	}
 }
 
 func change_channel(c *gin.Context) {
@@ -188,7 +191,10 @@ func change_channel(c *gin.Context) {
 	channel := c.Params.ByName("channel")
 
 	for _, number := range channel {
-		cec.Key(addr, "0x2"+string(number))
+		if resp := cec.Key(addr, "0x2"+string(number)); resp != nil {
+			c.Fail(500, resp)
+			break
+		}
 	}
 
 	c.String(200, channel)
@@ -207,11 +213,19 @@ func vol_step(c *gin.Context) {
 
 	for i := 0; i < steps; i++ {
 		if direction == "up" {
-			cec.Key(addr, "VolumeUp")
-			volume_level = volume_level + steps
+			if resp := cec.Key(addr, "VolumeUp"); resp == nil {
+				volume_level = volume_level + steps
+			} else {
+				c.Fail(500, resp)
+				break
+			}
 		} else if direction == "down" {
-			cec.Key(addr, "VolumeDown")
-			volume_level = volume_level - steps
+			if resp := cec.Key(addr, "VolumeDown"); resp == nil {
+				volume_level = volume_level - steps
+			} else {
+				c.Fail(500, resp)
+				break
+			}
 		}
 	}
 
@@ -236,14 +250,20 @@ func vol_set(c *gin.Context) {
 		var final_level = wanted_level - volume_level
 		log.Println("Final_level is " + strconv.Itoa(final_level))
 		for i := 0; i < final_level; i++ {
-			cec.Key(addr, "VolumeUp")
+			if resp := cec.Key(addr, "VolumeUp"); resp != nil {
+				c.Fail(500, resp)
+				break
+			}
 		}
 	} else if wanted_level < volume_level { // Requested level is less than current volume level
 		log.Println("SECOND")
 		var final_level = volume_level - wanted_level
 		log.Println("Final_level is " + strconv.Itoa(final_level))
 		for i := 0; i < final_level; i++ {
-			cec.Key(addr, "VolumeDown")
+			if resp := cec.Key(addr, "VolumeDown"); resp != nil {
+				c.Fail(500, resp)
+				break
+			}
 		}
 	}
 
@@ -272,7 +292,9 @@ func vol_up(c *gin.Context) {
 		c.String(400, "Volume already at maximum")
 	} else {
 		addr := c.MustGet("CECAddress").(int)
-		cec.Key(addr, "VolumeUp")
+		if resp := cec.Key(addr, "VolumeUp"); resp != nil {
+			c.Fail(500, resp)
+		}
 		volume_level = volume_level + 1
 		c.String(204, "")
 	}
@@ -283,7 +305,9 @@ func vol_down(c *gin.Context) {
 		c.String(400, "Volume is already at minimum")
 	} else {
 		addr := c.MustGet("CECAddress").(int)
-		cec.Key(addr, "VolumeDown")
+		if resp := cec.Key(addr, "VolumeDown"); resp != nil {
+			c.Fail(500, resp)
+		}
 		volume_level = volume_level - 1
 		c.String(204, "")
 	}
@@ -303,7 +327,10 @@ func vol_reset(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 	for i := 0; i < options.Audio.MaxVolume; i++ {
 		log.Println("Sending VolumeDown")
-		cec.Key(addr, "VolumeDown")
+		if resp := cec.Key(addr, "VolumeDown"); resp != nil {
+			c.Fail(500, resp)
+			break
+		}
 	}
 	volume_level = 0
 	c.String(200, strconv.Itoa(volume_level))
@@ -313,7 +340,9 @@ func key(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 	key := c.Params.ByName("key")
 
-	cec.Key(addr, key)
+	if resp := cec.Key(addr, key); resp != nil {
+		c.Fail(500, resp)
+	}
 	c.String(204, "")
 }
 
@@ -323,9 +352,13 @@ func multi_key(c *gin.Context) {
 	key_two := c.Params.ByName("key2")
 	delay, _ := strconv.Atoi(c.Params.ByName("delay"))
 
-	cec.Key(addr, key)
+	if resp := cec.Key(addr, key); resp != nil {
+		c.Fail(500, resp)
+	}
 	time.Sleep(time.Duration(delay) * time.Millisecond)
-	cec.Key(addr, key_two)
+	if resp := cec.Key(addr, key_two); resp != nil {
+		c.Fail(500, resp)
+	}
 	c.String(204, "")
 }
 
@@ -334,7 +367,9 @@ func transmit(c *gin.Context) {
 	c.Bind(&commands)
 
 	for _, val := range commands {
-		cec.Transmit(val)
+		if resp := cec.Transmit(val); resp != nil {
+			c.Fail(500, resp)
+		}
 	}
 	c.String(204, "")
 }
