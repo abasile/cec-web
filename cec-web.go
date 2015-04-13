@@ -134,7 +134,7 @@ func info(c *gin.Context) {
 	if list != nil {
 		c.JSON(200, list)
 	} else {
-		c.String(500, "")
+		c.Fail(500, errors.New("Unable to get info about connected CEC devices"))
 	}
 }
 
@@ -167,7 +167,7 @@ func power_status(c *gin.Context) {
 	} else if status == "standby" {
 		c.String(200, "off")
 	} else {
-		c.String(500, "invalid power state")
+		c.Fail(500, errors.New("invalid power state"))
 	}
 }
 
@@ -244,7 +244,7 @@ func vol_set(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 
 	if wanted_level > options.Audio.MaxVolume {
-		c.String(400, "The maximum volume level is "+strconv.Itoa(options.Audio.MaxVolume))
+		c.Fail(400, errors.New("The maximum volume level is "+strconv.Itoa(options.Audio.MaxVolume)))
 	} else if wanted_level > volume_level { // Requested level is greater then current volume level
 		log.Println("FIRST")
 		var final_level = wanted_level - volume_level
@@ -289,7 +289,7 @@ func vol_status(c *gin.Context) {
 
 func vol_up(c *gin.Context) {
 	if volume_level == options.Audio.MaxVolume {
-		c.String(400, "Volume already at maximum")
+		c.Fail(400, errors.New("Volume already at maximum"))
 	} else {
 		addr := c.MustGet("CECAddress").(int)
 		if resp := cec.Key(addr, "VolumeUp"); resp != nil {
@@ -302,7 +302,7 @@ func vol_up(c *gin.Context) {
 
 func vol_down(c *gin.Context) {
 	if volume_level == 0 {
-		c.String(400, "Volume is already at minimum")
+		c.Fail(400, errors.New("Volume is already at minimum"))
 	} else {
 		addr := c.MustGet("CECAddress").(int)
 		if resp := cec.Key(addr, "VolumeDown"); resp != nil {
