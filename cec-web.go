@@ -52,7 +52,7 @@ func CheckForDevice() gin.HandlerFunc {
 			input = options.Audio.AudioDevice
 		}
 		if addr := cec.GetLogicalAddressByName(input); addr == -1 {
-			c.Fail(404, errors.New("That device ("+input+") does not exist!"))
+			c.AbortWithError(404, errors.New("That device ("+input+") does not exist!"))
 		} else {
 			c.Set("CECAddress", addr)
 			c.Next()
@@ -134,7 +134,7 @@ func info(c *gin.Context) {
 	if list != nil {
 		c.JSON(200, list)
 	} else {
-		c.Fail(500, errors.New("Unable to get info about connected CEC devices"))
+		c.AbortWithError(500, errors.New("Unable to get info about connected CEC devices"))
 	}
 }
 
@@ -142,7 +142,7 @@ func power_on(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 
 	if err := cec.PowerOn(addr); err != nil {
-		c.Fail(500, err)
+		c.AbortWithError(500, err)
 	} else {
 		c.String(200, "on")
 	}
@@ -152,7 +152,7 @@ func power_off(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 
 	if err := cec.Standby(addr); err != nil {
-		c.Fail(500, err)
+		c.AbortWithError(500, err)
 	} else {
 		c.String(200, "off")
 	}
@@ -167,7 +167,7 @@ func power_status(c *gin.Context) {
 	} else if status == "standby" {
 		c.String(200, "off")
 	} else {
-		c.Fail(500, errors.New("invalid power state"))
+		c.AbortWithError(500, errors.New("invalid power state"))
 	}
 }
 
@@ -178,7 +178,7 @@ func input_status(c *gin.Context) {
 func input_change(c *gin.Context) {
 	input := c.Params.ByName("number")
 	if resp := cec.Transmit("3f:82:" + input + "0:00"); resp != nil {
-		c.Fail(500, resp)
+		c.AbortWithError(500, resp)
 	} else {
 		input_atoi, _ := strconv.Atoi(input)
 		input_number = int(input_atoi)
@@ -192,7 +192,7 @@ func change_channel(c *gin.Context) {
 
 	for _, number := range channel {
 		if resp := cec.Key(addr, "0x2"+string(number)); resp != nil {
-			c.Fail(500, resp)
+			c.AbortWithError(500, resp)
 			break
 		}
 	}
@@ -208,7 +208,7 @@ func vol_step(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 
 	if direction != "up" && direction != "down" {
-		c.Fail(400, errors.New("Invalid direction. Valid directions are up or down."))
+		c.AbortWithError(400, errors.New("Invalid direction. Valid directions are up or down."))
 	}
 
 	for i := 0; i < steps; i++ {
@@ -216,22 +216,22 @@ func vol_step(c *gin.Context) {
 			if resp := cec.Key(addr, "VolumeUp"); resp == nil {
 				volume_level = volume_level + steps
 			} else {
-				c.Fail(500, resp)
+				c.AbortWithError(500, resp)
 				break
 			}
 		} else if direction == "down" {
 			if resp := cec.Key(addr, "VolumeDown"); resp == nil {
 				volume_level = volume_level - steps
 			} else {
-				c.Fail(500, resp)
+				c.AbortWithError(500, resp)
 				break
 			}
 		}
 	}
 
-	if c.LastError == nil {
-		c.String(204, "")
-	}
+	// if c.LastError == nil {
+	// 	c.String(204, "")
+	// }
 }
 
 func vol_set(c *gin.Context) {
@@ -244,14 +244,14 @@ func vol_set(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 
 	if wanted_level > options.Audio.MaxVolume {
-		c.Fail(400, errors.New("The maximum volume level is "+strconv.Itoa(options.Audio.MaxVolume)))
+		c.AbortWithError(400, errors.New("The maximum volume level is "+strconv.Itoa(options.Audio.MaxVolume)))
 	} else if wanted_level > volume_level { // Requested level is greater then current volume level
 		log.Println("FIRST")
 		var final_level = wanted_level - volume_level
 		log.Println("Final_level is " + strconv.Itoa(final_level))
 		for i := 0; i < final_level; i++ {
 			if resp := cec.Key(addr, "VolumeUp"); resp != nil {
-				c.Fail(500, resp)
+				c.AbortWithError(500, resp)
 				break
 			}
 		}
@@ -261,7 +261,7 @@ func vol_set(c *gin.Context) {
 		log.Println("Final_level is " + strconv.Itoa(final_level))
 		for i := 0; i < final_level; i++ {
 			if resp := cec.Key(addr, "VolumeDown"); resp != nil {
-				c.Fail(500, resp)
+				c.AbortWithError(500, resp)
 				break
 			}
 		}
@@ -289,11 +289,11 @@ func vol_status(c *gin.Context) {
 
 func vol_up(c *gin.Context) {
 	if volume_level == options.Audio.MaxVolume {
-		c.Fail(400, errors.New("Volume already at maximum"))
+		c.AbortWithError(400, errors.New("Volume already at maximum"))
 	} else {
 		addr := c.MustGet("CECAddress").(int)
 		if resp := cec.Key(addr, "VolumeUp"); resp != nil {
-			c.Fail(500, resp)
+			c.AbortWithError(500, resp)
 		}
 		volume_level = volume_level + 1
 		c.String(204, "")
@@ -302,11 +302,11 @@ func vol_up(c *gin.Context) {
 
 func vol_down(c *gin.Context) {
 	if volume_level == 0 {
-		c.Fail(400, errors.New("Volume is already at minimum"))
+		c.AbortWithError(400, errors.New("Volume is already at minimum"))
 	} else {
 		addr := c.MustGet("CECAddress").(int)
 		if resp := cec.Key(addr, "VolumeDown"); resp != nil {
-			c.Fail(500, resp)
+			c.AbortWithError(500, resp)
 		}
 		volume_level = volume_level - 1
 		c.String(204, "")
@@ -328,7 +328,7 @@ func vol_reset(c *gin.Context) {
 	for i := 0; i < options.Audio.MaxVolume; i++ {
 		log.Println("Sending VolumeDown")
 		if resp := cec.Key(addr, "VolumeDown"); resp != nil {
-			c.Fail(500, resp)
+			c.AbortWithError(500, resp)
 			break
 		}
 	}
@@ -341,7 +341,7 @@ func key(c *gin.Context) {
 	key := c.Params.ByName("key")
 
 	if resp := cec.Key(addr, key); resp != nil {
-		c.Fail(500, resp)
+		c.AbortWithError(500, resp)
 	}
 	c.String(204, "")
 }
@@ -353,11 +353,11 @@ func multi_key(c *gin.Context) {
 	delay, _ := strconv.Atoi(c.Params.ByName("delay"))
 
 	if resp := cec.Key(addr, key); resp != nil {
-		c.Fail(500, resp)
+		c.AbortWithError(500, resp)
 	}
 	time.Sleep(time.Duration(delay) * time.Millisecond)
 	if resp := cec.Key(addr, key_two); resp != nil {
-		c.Fail(500, resp)
+		c.AbortWithError(500, resp)
 	}
 	c.String(204, "")
 }
@@ -368,7 +368,7 @@ func transmit(c *gin.Context) {
 
 	for _, val := range commands {
 		if resp := cec.Transmit(val); resp != nil {
-			c.Fail(500, resp)
+			c.AbortWithError(500, resp)
 		}
 	}
 	c.String(204, "")
