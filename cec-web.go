@@ -64,6 +64,7 @@ func CheckForDevice() gin.HandlerFunc {
 
 func main() {
 	if _, err := parser.Parse(); err != nil {
+		log.Printf(err)
 		os.Exit(1)
 	}
 	cec.Open(options.CEC.Adapter, options.CEC.Name, options.CEC.Type)
