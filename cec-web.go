@@ -16,7 +16,7 @@ import (
 type HTTPOptions struct {
 	Host     string `short:"i" long:"ip" description:"IP address to listen on" default:"0.0.0.0"`
 	Port     string `short:"p" long:"port" description:"TCP port to listen on" default:"8080"`
-	Announce bool   `short:"r" long:"announce" description:"Whether to announce the server location via Avahi/Bonjour/Zeroconf" default:"true"`
+	Announce bool   `short:"r" long:"announce" description:"Whether to announce the server location via Avahi/Bonjour/Zeroconf"`
 }
 
 type CECOptions struct {
