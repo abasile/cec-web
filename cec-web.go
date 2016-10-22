@@ -9,7 +9,6 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/andrewtj/dnssd"
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
@@ -17,9 +16,8 @@ import (
 )
 
 type HTTPOptions struct {
-	Host     string `short:"i" long:"ip" description:"IP address to listen on" default:"0.0.0.0"`
-	Port     string `short:"p" long:"port" description:"TCP port to listen on" default:"8080"`
-	Announce bool   `short:"r" long:"announce" description:"Whether to announce the server location via Avahi/Bonjour/Zeroconf"`
+	Host string `short:"i" long:"ip" description:"IP address to listen on" default:"0.0.0.0"`
+	Port string `short:"p" long:"port" description:"TCP port to listen on" default:"8080"`
 }
 
 type CECOptions struct {
@@ -147,16 +145,6 @@ func main() {
 		}
 	}
 
-	if options.HTTP.Announce == true {
-		port, _ := strconv.Atoi(options.HTTP.Port)
-		op, err := dnssd.StartRegisterOp("", "_cec-web._tcp", port, RegisterCallbackFunc)
-		if err != nil {
-			log.Printf("Failed to register service: %s", err)
-			return
-		}
-		defer op.Stop()
-	}
-
 	cec_conn = *conn
 
 	go ReceiveCallbackEvents()
@@ -166,19 +154,6 @@ func main() {
 	log.Infof("cec-web is live and on air at %s", hostAndPort)
 
 	r.Run(hostAndPort)
-}
-
-func RegisterCallbackFunc(op *dnssd.RegisterOp, err error, add bool, name, serviceType, domain string) {
-	if err != nil {
-		// op is now inactive
-		log.Printf("Service registration failed: %s", err)
-		return
-	}
-	if add {
-		log.Printf("Service registered as “%s“ in %s", name, domain)
-	} else {
-		log.Printf("Service “%s” removed from %s", name, domain)
-	}
 }
 
 func ReceiveCallbackEvents() {
