@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
-	cec "gopkg.in/robbiet480/cec.v2"
+	cec "github.com/robbiet480/cec"
 )
 
 type HTTPOptions struct {
