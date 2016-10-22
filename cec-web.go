@@ -3,12 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/andrewtj/dnssd"
+	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
 	cec "gopkg.in/robbiet480/cec.v2"
@@ -42,11 +44,19 @@ type Options struct {
 var options Options
 var parser = flags.NewParser(&options, flags.Default)
 
-var cec_conn *cec.Connection
+var cec_conn cec.Connection
 
 var volume_level = options.Audio.StartVolume
 var input_number int
 var is_muted = false
+
+var received_events = []interface{}{}
+var message_events = []cec.LogMessage{}
+var key_press_events = []cec.KeyPress{}
+var command_events = []cec.Command{}
+var alert_events = []cec.Alert{}
+var menu_state_events = []cec.MenuState{}
+var source_activated_events = []cec.SourceActivated{}
 
 func CheckForDevice() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -71,12 +81,12 @@ func main() {
 		log.Fatalln("Parser error", err)
 	}
 
-	cec_conn, err := cec.Open(options.CEC.Adapter, options.CEC.Name, options.CEC.Type)
+	conn, err := cec.Open(options.CEC.Adapter, options.CEC.Name, options.CEC.Type)
 	if err != nil {
 		log.Fatalln("Error opening CEC connection", err)
 	}
 
-	if cec_conn.PollDevice(cec.GetLogicalAddressByName(options.Audio.AudioDevice)) != true {
+	if conn.PollDevice(cec.GetLogicalAddressByName(options.Audio.AudioDevice)) != true {
 		var word = "a"
 		if options.Audio.AudioDevice == "Audio" {
 			word = "an"
@@ -85,10 +95,15 @@ func main() {
 		// os.Exit(1)
 	}
 
-	r := gin.Default()
-	r.Use(gin.ErrorLogger())
+	gin.SetMode(gin.ReleaseMode)
+
+	r := gin.New()
+	r.Use(ginrus.Ginrus(log.StandardLogger(), time.RFC3339, true))
+	r.Use(gin.Recovery())
 	r.GET("/config", config)
 	r.GET("/info", info)
+	r.GET("/logs", all_logs)
+	r.GET("/logs/:type", logs_for_type)
 	r.GET("/input", input_status)
 	r.PUT("/input/:number", input_change)
 	r.GET("/power/:device", CheckForDevice(), power_status)
@@ -114,7 +129,7 @@ func main() {
 		addr := cec.GetLogicalAddressByName(options.Audio.AudioDevice)
 		for i := 0; i < options.Audio.MaxVolume; i++ {
 			log.Println("Sending VolumeDown")
-			cec_conn.Key(addr, "VolumeDown")
+			conn.Key(addr, "VolumeDown")
 			volume_level = 0
 		}
 		log.Println("Volume has been set to 0")
@@ -124,9 +139,9 @@ func main() {
 
 	log.Println("Getting the current active input")
 
-	for address, active := range cec_conn.GetActiveDevices() {
-		if (active) && (cec_conn.IsActiveSource(address)) {
-			input_str := strings.Split(cec_conn.GetDevicePhysicalAddress(address), ".")[0]
+	for address, active := range conn.GetActiveDevices() {
+		if (active) && (conn.IsActiveSource(address)) {
+			input_str := strings.Split(conn.GetDevicePhysicalAddress(address), ".")[0]
 			input_atoi, _ := strconv.Atoi(input_str)
 			input_number = int(input_atoi)
 		}
@@ -142,7 +157,15 @@ func main() {
 		defer op.Stop()
 	}
 
-	r.Run(options.HTTP.Host + ":" + options.HTTP.Port)
+	cec_conn = *conn
+
+	go ReceiveCallbackEvents()
+
+	hostAndPort := net.JoinHostPort(options.HTTP.Host, options.HTTP.Port)
+
+	log.Infof("cec-web is live and on air at %s", hostAndPort)
+
+	r.Run(hostAndPort)
 }
 
 func RegisterCallbackFunc(op *dnssd.RegisterOp, err error, add bool, name, serviceType, domain string) {
@@ -158,6 +181,35 @@ func RegisterCallbackFunc(op *dnssd.RegisterOp, err error, add bool, name, servi
 	}
 }
 
+func ReceiveCallbackEvents() {
+	for {
+		event := <-cec.CallbackEvents
+		received_events = append(received_events, event)
+		switch event := event.(type) {
+		case cec.LogMessage:
+			// log.Infoln("Received LogMessage", event.Message)
+			message_events = append(message_events, event)
+		case cec.KeyPress:
+			key_press_events = append(key_press_events, event)
+			// log.Infoln("Received KeyPress", event)
+		case cec.Command:
+			command_events = append(command_events, event)
+			// log.Infoln("Received Command", event)
+		case cec.Alert:
+			alert_events = append(alert_events, event)
+			// log.Infoln("Received Alert", event)
+		case cec.MenuState:
+			menu_state_events = append(menu_state_events, event)
+			// log.Infoln("Received MenuState", event)
+		case cec.SourceActivated:
+			source_activated_events = append(source_activated_events, event)
+			// log.Infoln("Received SourceActivated", event)
+		default:
+			// log.Infoln("Received unknown callback event!", event)
+		}
+	}
+}
+
 func config(c *gin.Context) {
 	c.JSON(200, options)
 }
@@ -168,6 +220,30 @@ func info(c *gin.Context) {
 		c.JSON(200, list)
 	} else {
 		c.AbortWithError(500, errors.New("Unable to get info about connected CEC devices"))
+	}
+}
+
+func all_logs(c *gin.Context) {
+	c.JSON(200, received_events)
+}
+
+func logs_for_type(c *gin.Context) {
+	logType := c.Params.ByName("type")
+	switch logType {
+	case "message_events":
+		c.JSON(200, message_events)
+	case "key_press_events":
+		c.JSON(200, key_press_events)
+	case "command_events":
+		c.JSON(200, command_events)
+	case "alert_events":
+		c.JSON(200, alert_events)
+	case "menu_state_events":
+		c.JSON(200, menu_state_events)
+	case "source_activated_events":
+		c.JSON(200, source_activated_events)
+	default:
+		c.AbortWithError(404, errors.New("No logs of given type ("+logType+") exist!"))
 	}
 }
 
@@ -262,9 +338,6 @@ func vol_step(c *gin.Context) {
 		}
 	}
 
-	// if c.LastError == nil {
-	// 	c.String(204, "")
-	// }
 }
 
 func vol_set(c *gin.Context) {
