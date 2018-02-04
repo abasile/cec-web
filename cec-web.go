@@ -64,12 +64,14 @@ func CheckForDevice() gin.HandlerFunc {
 		} else {
 			input = options.Audio.AudioDevice
 		}
-		if addr := cec.GetLogicalAddressByName(input); addr == -1 {
-			c.AbortWithError(404, errors.New("That device ("+input+") does not exist!"))
-		} else {
-			c.Set("CECAddress", addr)
-			c.Next()
+		addr, err := strconv.Atoi(input)
+		if err != nil {
+			if addr := cec.GetLogicalAddressByName(input); addr == -1 {
+				c.AbortWithError(404, errors.New("That device ("+input+") does not exist!"))
+			}
 		}
+		c.Set("CECAddress", addr)
+		c.Next()
 	}
 }
 
@@ -261,10 +263,10 @@ func input_status(c *gin.Context) {
 
 func input_change(c *gin.Context) {
 	input := c.Params.ByName("number")
-	if resp := cec_conn.Transmit(fmt.Sprintf("3f:82:%d0:00", input)); resp != nil {
+	input_atoi, _ := strconv.Atoi(input)
+	if resp := cec_conn.Transmit(fmt.Sprintf("3f:82:%d0:00", input_atoi)); resp != nil {
 		c.AbortWithError(500, resp)
 	} else {
-		input_atoi, _ := strconv.Atoi(input)
 		input_number = int(input_atoi)
 		c.String(200, "INPUT HDMI "+input)
 	}
