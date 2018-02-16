@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
 	"github.com/jessevdk/go-flags"
-	cec "github.com/robbiet480/cec"
+	cec "github.com/cydine/cec"
 )
 
 type HTTPOptions struct {
@@ -37,6 +37,10 @@ type Options struct {
 	HTTP  HTTPOptions  `group:"HTTP Server Options"`
 	CEC   CECOptions   `group:"CEC Options"`
 	Audio AudioOptions `group:"Audio Options"`
+}
+
+type StateJSON struct {
+	State string `json:"state" binding:"required"`
 }
 
 var options Options
@@ -107,6 +111,7 @@ func main() {
 	r.GET("/input", input_status)
 	r.PUT("/input/:number", input_change)
 	r.GET("/power/:device", CheckForDevice(), power_status)
+	r.POST("/power/:device", CheckForDevice(), power_toggle)
 	r.PUT("/power/:device", CheckForDevice(), power_on)
 	r.DELETE("/power/:device", CheckForDevice(), power_off)
 	r.GET("/volume", CheckForDevice(), vol_status)
@@ -244,14 +249,35 @@ func power_off(c *gin.Context) {
 	}
 }
 
+func power_toggle(c *gin.Context) {
+	addr := c.MustGet("CECAddress").(int)
+
+	var json StateJSON
+	c.BindJSON(&json)
+
+	if json.State == "on" {
+		if err := cec_conn.PowerOn(addr); err != nil {
+			c.AbortWithError(500, err)
+		} else {
+			c.JSON(200, gin.H{"state":"on"})
+		}
+	} else if json.State == "off" {
+		if err := cec_conn.Standby(addr); err != nil {
+			c.AbortWithError(500, err)
+		} else {
+			c.JSON(200, gin.H{"state":"off"})
+		}
+	}
+}
+
 func power_status(c *gin.Context) {
 	addr := c.MustGet("CECAddress").(int)
 
-	status := cec_conn.GetDevicePowerStatus(addr)
-	if status == "on" {
-		c.String(200, "on")
-	} else if status == "standby" {
-		c.String(200, "off")
+	state := cec_conn.GetDevicePowerStatus(addr)
+	if (state == "on" || state =="starting") {
+		c.JSON(200, gin.H{"state":"on"})
+	} else if (state == "standby" || state == "shutting down"){
+		c.JSON(200, gin.H{"state":"off"})
 	} else {
 		c.AbortWithError(500, errors.New("invalid power state"))
 	}
